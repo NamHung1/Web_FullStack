@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { List, Button, Image, message, Empty, Spin, Card } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { getCartAPI, removeFromCartAPI } from '../../api/cart.api';
+import { useCart } from '../../hooks/useCart';
 import styles from './Cart.module.css';
 
 interface Product {
@@ -25,6 +26,7 @@ interface CartResponseItem {
 export default function Cart() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const { refreshCartCount } = useCart();
 
   const token = localStorage.getItem('token');
 
@@ -37,6 +39,7 @@ export default function Cart() {
       }));
 
       setItems(normalizedItems);
+      refreshCartCount();
     } catch (err) {
       console.error(err);
       message.error('Failed to load cart');
@@ -60,6 +63,7 @@ export default function Cart() {
       await removeFromCartAPI(productId);
 
       setItems((prev) => prev.filter((item) => item.product._id !== productId));
+      refreshCartCount();
 
       message.success('Item removed');
     } catch {
