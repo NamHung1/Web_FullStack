@@ -7,6 +7,7 @@ import { hashPassword } from "../utils/hash";
 import User from "../models/User";
 
 const router = Router();
+const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
 
 /*
  NORMAL LOGIN
@@ -60,7 +61,7 @@ router.get(
     const token = generateToken(req.user._id);
 
     res.redirect(
-      `http://localhost:5173/oauth-success?token=${token}`
+      `${frontendUrl}/oauth-success?token=${token}`
     );
   }
 );
@@ -82,7 +83,7 @@ router.get(
     const token = generateToken(req.user._id);
 
     res.redirect(
-      `http://localhost:5173/oauth-success?token=${token}`
+      `${frontendUrl}/oauth-success?token=${token}`
     );
   }
 );

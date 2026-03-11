@@ -7,6 +7,7 @@ import api from '../../api/axios';
 interface Order {
   _id: string;
   user: string;
+  // product: string,
   total: number;
   status: 'pending' | 'completed' | 'cancelled';
   paymentMethod?: 'cod' | 'bank_transfer' | 'momo';
@@ -38,6 +39,11 @@ export default function ManageOrders() {
       dataIndex: 'userId',
       render: (user: { name: string; email: string }) => `${user.name} (${user.email})`,
     },
+    // {
+    //   title: 'Product name',
+    //   dataIndex: 'name',
+    //   render: (name: string) => `${product.name}`,
+    // },
     {
       title: 'Total',
       dataIndex: 'totalPrice',
