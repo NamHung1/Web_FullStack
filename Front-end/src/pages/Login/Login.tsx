@@ -35,6 +35,11 @@ export default function Login() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    window.location.href = `${apiUrl}/auth/google`;
+  };
+
   return (
     <div className={styles.container}>
       <Card className={styles.card}>
@@ -53,6 +58,12 @@ export default function Login() {
             Login
           </Button>
         </Form>
+
+        <div className={styles.oauthSection}>
+          <Button block onClick={handleGoogleLogin}>
+            Login with Google
+          </Button>
+        </div>
 
         <p className={styles.text}>
           No account? <Link to="/register">Register</Link>

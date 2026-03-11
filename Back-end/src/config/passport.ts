@@ -1,8 +1,11 @@
 import passport from "passport";
+import dotenv from "dotenv";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as FacebookStrategy } from "passport-facebook";
 
 import User from "../models/User";
+
+dotenv.config();
 
 passport.serializeUser((user: any, done) => {
   done(null, user.id);
@@ -17,7 +20,11 @@ passport.deserializeUser(async (id, done) => {
  GOOGLE LOGIN
 */
 
-if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_ID !== 'xxxxx') {
+if (
+  process.env.GOOGLE_CLIENT_ID &&
+  process.env.GOOGLE_CLIENT_SECRET &&
+  process.env.GOOGLE_CLIENT_ID !== "xxxxx"
+) {
   passport.use(
     new GoogleStrategy(
       {
@@ -27,7 +34,11 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_ID !== 'xxxxx') {
       },
 
       async (_accessToken, _refreshToken, profile, done) => {
-        const email = profile.emails?.[0].value;
+        const email = profile.emails?.[0]?.value?.toLowerCase();
+
+        if (!email) {
+          return done(new Error("Google account does not provide an email"));
+        }
 
         let user = await User.findOne({ email });
 

@@ -5,6 +5,7 @@ import AdminLayout from '../layouts/AdminLayout';
 
 import Home from '../pages/Home/Home';
 import Login from '../pages/Login/Login';
+import OAuthSuccess from '../pages/OAuthSuccess/OAuthSuccess';
 import Register from '../pages/Register/Register';
 import ProductDetail from '../pages/ProductDetail/ProductDetail';
 import Cart from '../pages/Cart/Cart';
@@ -35,6 +36,11 @@ export const router = createBrowserRouter([
       {
         path: '/register',
         element: <Register />,
+      },
+
+      {
+        path: '/oauth-success',
+        element: <OAuthSuccess />,
       },
 
       {
