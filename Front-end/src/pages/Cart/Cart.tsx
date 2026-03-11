@@ -4,6 +4,7 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { getCartAPI, removeFromCartAPI } from '../../api/cart.api';
 import { useCart } from '../../hooks/useCart';
 import styles from './Cart.module.css';
+import { useNavigate } from 'react-router-dom';
 
 interface Product {
   _id: string;
@@ -28,8 +29,11 @@ export default function Cart() {
   const [loading, setLoading] = useState(true);
   const { refreshCartCount } = useCart();
 
+  const navigate = useNavigate()
+
   const token = localStorage.getItem('token');
 
+  // fetch User API
   const fetchCart = async () => {
     try {
       const data = await getCartAPI();
@@ -48,6 +52,7 @@ export default function Cart() {
     }
   };
 
+  // Cảnh báo yêu cầu đăng nhập
   useEffect(() => {
     if (!token) {
       message.warning('Please login to view cart');
@@ -58,6 +63,7 @@ export default function Cart() {
     fetchCart();
   }, [token]);
 
+  // Xoá sản phẩm ra khỏi rỏ hàng
   const removeItem = async (productId: string) => {
     try {
       await removeFromCartAPI(productId);
@@ -71,8 +77,10 @@ export default function Cart() {
     }
   };
 
+  // Tính tổng số sản phẩm
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
+  // Tính tổng tiền
   const totalPrice = items.reduce(
     (sum, item) => sum + item.quantity * item.product.price,
     0,
@@ -154,7 +162,7 @@ export default function Cart() {
               type="primary"
               size="large"
               block
-              className={styles.checkout}
+              onClick={() => navigate('/checkout')}
             >
               Checkout
             </Button>

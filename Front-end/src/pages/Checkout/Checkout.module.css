@@ -1,11 +1,35 @@
 .container {
   display: flex;
-
   justify-content: center;
-
   padding: 40px;
 }
 
 .card {
   width: 400px;
+}
+
+.orderList {
+  margin: 16px 0;
+}
+
+.total {
+  font-size: 18px;
+
+  font-weight: 600;
+
+  margin-bottom: 16px;
+}
+
+.loading {
+  display: flex;
+
+  justify-content: center;
+
+  margin-top: 80px;
+}
+
+.empty {
+  margin-top: 80px;
+
+  text-align: center;
 }
