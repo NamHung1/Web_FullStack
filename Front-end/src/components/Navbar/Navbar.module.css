@@ -1,0 +1,61 @@
+.navbar {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 15px 40px;
+
+  background: white;
+
+  border-bottom: 1px solid #eee;
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 100;
+}
+
+.logo {
+  font-size: 22px;
+
+  font-weight: bold;
+
+  color: #1677ff;
+}
+
+.links {
+  display: flex;
+
+  align-items: center;
+
+  gap: 25px;
+}
+
+.links a {
+  color: #333;
+
+  font-weight: 500;
+
+  transition: 0.2s;
+}
+
+.links a:hover {
+  color: #1677ff;
+}
+
+.cartIcon {
+  font-size: 22px;
+
+  cursor: pointer;
+}
+
+.userBox {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}

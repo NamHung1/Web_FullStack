@@ -1,0 +1,107 @@
+.container {
+  padding: 40px;
+
+  max-width: 1200px;
+
+  margin: auto;
+}
+
+.title {
+  font-size: 30px;
+
+  margin-bottom: 30px;
+
+  font-weight: 600;
+}
+
+.wrapper {
+  display: grid;
+
+  grid-template-columns: 2fr 1fr;
+
+  gap: 30px;
+}
+
+.list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 15px;
+}
+
+.itemCard {
+  border-radius: 10px;
+
+  transition: 0.25s;
+}
+
+.itemCard:hover {
+  transform: translateY(-3px);
+
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.item {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+.image {
+  border-radius: 6px;
+}
+
+.info {
+  flex: 1;
+}
+
+.price {
+  color: #1677ff;
+
+  font-weight: 600;
+}
+
+.summary {
+  position: sticky;
+
+  top: 100px;
+}
+
+.totalPrice {
+  font-size: 20px;
+
+  font-weight: bold;
+
+  margin: 10px 0;
+}
+
+.checkout {
+  margin-top: 10px;
+}
+
+.loading {
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  height: 50vh;
+}
+
+.empty {
+  margin-top: 100px;
+
+  text-align: center;
+}
+
+.loginRequired {
+  text-align: center;
+
+  margin-top: 100px;
+}

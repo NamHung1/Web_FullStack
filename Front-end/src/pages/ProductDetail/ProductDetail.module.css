@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+
+  gap: 40px;
+
+  padding: 40px;
+}
+
+.image {
+  width: 300px;
+
+  border-radius: 8px;
+}
+
+.info {
+  max-width: 400px;
+}
+
+.price {
+  font-size: 22px;
+
+  color: #1677ff;
+}

@@ -1,0 +1,59 @@
+.container {
+  padding: 40px;
+
+  background: #f5f7fb;
+
+  min-height: 100vh;
+}
+
+.title {
+  font-size: 32px;
+
+  font-weight: 600;
+
+  margin-bottom: 30px;
+}
+
+.card {
+  text-align: center;
+
+  border-radius: 12px;
+
+  transition: all 0.25s ease;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.card:hover {
+  transform: translateY(-6px);
+
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.icon {
+  font-size: 34px;
+
+  color: #1677ff;
+
+  margin-bottom: 10px;
+}
+
+.number {
+  font-size: 30px;
+
+  font-weight: bold;
+
+  margin-top: 8px;
+
+  color: #1677ff;
+}
+
+.loading {
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  height: 60vh;
+}

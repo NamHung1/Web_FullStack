@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  height: 80vh;
+}
+
+.card {
+  width: 350px;
+}
+
+.text {
+  margin-top: 15px;
+
+  text-align: center;
+}
