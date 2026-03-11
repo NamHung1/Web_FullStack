@@ -3,6 +3,7 @@ import { Button, Spin, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { getProductAPI } from '../../api/product.api';
 import { addToCartAPI } from '../../api/cart.api';
+import { useCart } from '../../hooks/useCart';
 import type { Product } from '../../types/product';
 import styles from './ProductDetail.module.css';
 
@@ -11,6 +12,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const { incrementCount } = useCart();
 
   useEffect(() => {
     if (id) {
@@ -35,6 +37,7 @@ export default function ProductDetail() {
     setAdding(true);
     try {
       await addToCartAPI(product._id, 1);
+      incrementCount(1);
       message.success('Added to cart');
     } catch {
       message.error('Failed to add to cart. Please login first.');

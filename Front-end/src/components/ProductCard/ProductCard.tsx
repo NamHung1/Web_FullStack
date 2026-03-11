@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function ProductCard({ product }: Props) {
-  const { addToCart } = useCart();
+  const { addToCart, incrementCount } = useCart();
   const navigate = useNavigate();
 
   const handleNavigateToDetail = () => {
@@ -23,10 +23,10 @@ export default function ProductCard({ product }: Props) {
   const handleAddToCart = async (event: MouseEvent<HTMLElement>) => {
     event?.stopPropagation();
 
-    addToCart(product);
-
     try {
       await addToCartAPI(product._id, 1);
+      addToCart(product);
+      incrementCount(1);
       message.success('Added to cart');
     } catch {
       message.error('Failed to add to cart. Please login first.');

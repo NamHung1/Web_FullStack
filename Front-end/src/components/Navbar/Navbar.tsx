@@ -1,11 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Badge, Button, Avatar } from 'antd';
 import { ShoppingCartOutlined, UserOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
 
 import styles from './Navbar.module.css';
 
 import { useCart } from '../../hooks/useCart';
-import { useEffect, useState } from 'react';
 import api from '../../api/axios';
 
 interface User {
@@ -14,7 +14,7 @@ interface User {
 }
 
 export default function Navbar() {
-  const { items } = useCart();
+  const { cartCount, refreshCartCount } = useCart();
 
   const navigate = useNavigate();
 
@@ -28,17 +28,18 @@ export default function Navbar() {
         .get('/auth/me')
         .then((res) => {
           setUser(res.data);
+          refreshCartCount();
         })
         .catch(() => {
           localStorage.removeItem('token');
           setUser(null);
         });
+      return;
     }
-  }, [token]);
+  }, [token, refreshCartCount]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    setUser(null);
     navigate('/login');
   };
 
@@ -55,7 +56,7 @@ export default function Navbar() {
 
         {user && (
           <Link to="/cart">
-            <Badge count={items.length} offset={[5, 0]}>
+            <Badge count={cartCount} offset={[5, 0]}>
               <ShoppingCartOutlined className={styles.cartIcon} />
             </Badge>
           </Link>
