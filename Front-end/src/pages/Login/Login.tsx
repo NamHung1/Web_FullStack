@@ -15,11 +15,15 @@ export default function Login() {
     try {
       const res = await api.post('/auth/login', {
         ...values,
-        email: values.email.toLowerCase()
+        email: values.email.toLowerCase(),
       });
       login(res.data.user, res.data.token);
       message.success('Login successful!');
-      navigate('/');
+      if (res.data.user?.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
     } catch (error: any) {
       if (error.response?.data?.message) {
         message.error(error.response.data.message);

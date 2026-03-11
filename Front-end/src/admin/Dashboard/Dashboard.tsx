@@ -85,7 +85,7 @@ export default function Dashboard() {
 
             <h3>Revenue</h3>
 
-            <p className={styles.number}>${stats?.revenue.toLocaleString()}</p>
+            <p className={styles.number}>${(stats?.revenue ?? 0).toLocaleString()}</p>
           </Card>
         </Col>
       </Row>

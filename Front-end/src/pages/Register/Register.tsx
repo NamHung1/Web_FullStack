@@ -19,13 +19,10 @@ export default function Register() {
     try {
       setLoading(true);
 
-      const res = await api.post(
-        '/auth/register',
-        {
-          ...values,
-          email: values.email.toLowerCase()
-        },
-      );
+      await api.post('/auth/register', {
+        ...values,
+        email: values.email.toLowerCase(),
+      });
 
       message.success('Register successful! Please login.');
 
