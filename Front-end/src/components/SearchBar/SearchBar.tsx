@@ -1,36 +1,55 @@
-import { Input } from "antd"
+import { Input, Select } from 'antd';
+import { useEffect, useState } from 'react';
 
-import { useState } from "react"
+import styles from './SearchBar.module.css';
 
-import styles from "./SearchBar.module.css"
-
-interface Props {
-
-  onSearch: (value: string) => void
-
+interface SearchCategory {
+  _id: string;
+  name: string;
 }
 
-export default function SearchBar({ onSearch }: Props) {
+interface Props {
+  onSearch: (value: string) => void;
+  categories?: SearchCategory[];
+  selectedCategory?: string;
+  onCategoryChange?: (value: string) => void;
+}
 
-  const [value, setValue] = useState("")
+export default function SearchBar({
+  onSearch,
+  categories = [],
+  selectedCategory = '',
+  onCategoryChange,
+}: Props) {
+  const [value, setValue] = useState('');
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      onSearch(value);
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [value, onSearch]);
 
   return (
-
     <div className={styles.search}>
-
-      <Input.Search
-
+      <Input
         placeholder="Search product..."
-
         value={value}
-
         onChange={(e) => setValue(e.target.value)}
-
-        onSearch={() => onSearch(value)}
-
       />
-
+      <Select
+        value={selectedCategory || 'all'}
+        style={{ width: 220 }}
+        onChange={(nextValue) =>
+          onCategoryChange?.(nextValue === 'all' ? '' : nextValue)
+        }
+        options={[
+          { label: 'All categories', value: 'all' },
+          ...categories.map((category) => ({
+            label: category.name,
+            value: category._id,
+          })),
+        ]}
+      />
     </div>
-
-  )
+  );
 }

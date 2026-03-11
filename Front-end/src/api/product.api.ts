@@ -1,22 +1,33 @@
-import api from "./axios"
+import api from './axios';
 
-export const getProductsAPI = async () => {
+export const getProductsAPI = async (categoryId?: string) => {
+  const query = categoryId ? `?category=${categoryId}` : '';
+  const res = await api.get(`/products${query}`);
 
-  const res = await api.get("/products")
+  return res.data;
+};
 
-  return res.data
-}
+export const searchProductsAPI = async (
+  search: string,
+  categoryId?: string,
+) => {
+  const params = new URLSearchParams();
 
-export const searchProductsAPI = async (search: string) => {
+  if (search.trim()) {
+    params.set('search', search);
+  }
+  if (categoryId) {
+    params.set('category', categoryId);
+  }
 
-  const res = await api.get(`/products?search=${search}`)
+  const query = params.toString();
+  const res = await api.get(`/products${query ? `?${query}` : ''}`);
 
-  return res.data
-}
+  return res.data;
+};
 
 export const getProductAPI = async (id: string) => {
+  const res = await api.get(`/products/${id}`);
 
-  const res = await api.get(`/products/${id}`)
-
-  return res.data
-}
+  return res.data;
+};
