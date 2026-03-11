@@ -6,13 +6,13 @@ import Cart from "../models/Cart";
 export const getOrders = async (req: Request, res: Response) => {
   const userId = (req as any).user.id;
 
-  const orders = await Order.find({ userId }).populate("products.productId");
+  const orders = await Order.find({ userId }).populate("products.productId").sort({ createdAt: -1 });
 
   res.json(orders);
 };
 
 export const getAllOrders = async (req: Request, res: Response) => {
-  const orders = await Order.find().populate("userId", "name email").populate("products.productId");
+  const orders = await Order.find().populate("userId", "name email").populate("products.productId").sort({ createdAt: -1 });
 
   res.json(orders);
 };
@@ -20,10 +20,14 @@ export const getAllOrders = async (req: Request, res: Response) => {
 // Tạo order mới
 export const createOrder = async (req: Request, res: Response) => {
   const userId = (req as any).user.id;
-  const { address, phone } = req.body;
+  const { address, phone, paymentMethod } = req.body;
 
-  if (!address || !phone) {
-    return res.status(400).json({ message: "Address and phone are required" });
+  if (!address || !phone || !paymentMethod) {
+    return res.status(400).json({ message: "Address, phone and payment method are required" });
+  }
+
+  if (!["cod", "bank_transfer", "momo"].includes(paymentMethod)) {
+    return res.status(400).json({ message: "Invalid payment method" });
   }
 
   const cart = await Cart.findOne({ userId }).populate("items.productId");
@@ -49,7 +53,7 @@ export const createOrder = async (req: Request, res: Response) => {
     totalPrice,
     shippingAddress: address,
     phone,
-    paymentMethod: "cod"
+    paymentMethod
   });
 
   (cart.items as any[]).splice(0, (cart.items as any[]).length);
