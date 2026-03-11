@@ -1,12 +1,14 @@
-import { Table, Tag, message } from 'antd';
+import { Table, Tag, Button, Popconfirm, message } from 'antd';
 import { useEffect, useState } from 'react';
-import { getOrdersAPI } from '../../api/order.api';
+import { cancelOrderAPI, getOrdersAPI } from '../../api/order.api';
 import styles from './Orders.module.css';
 
 interface Order {
   _id: string;
   totalPrice: number;
   status: string;
+  paymentMethod: 'cod' | 'bank_transfer' | 'momo';
+  cancelReason?: string;
   createdAt: string;
 }
 
@@ -48,11 +50,48 @@ export default function Orders() {
       ),
     },
     {
+      title: 'Payment',
+      dataIndex: 'paymentMethod',
+      render: (method: Order['paymentMethod']) =>
+        method === 'cod' ? 'COD' : method === 'bank_transfer' ? 'Bank Transfer' : 'MoMo',
+    },
+    {
       title: 'Date',
       dataIndex: 'createdAt',
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
+    {
+      title: 'Action',
+      render: (_: unknown, record: Order) => {
+        if (record.status !== 'pending') {
+          return record.cancelReason ? `Reason: ${record.cancelReason}` : '-';
+        }
+
+        return (
+          <Popconfirm
+            title="Cancel this order?"
+            onConfirm={() => handleCancel(record._id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button danger size="small">
+              Cancel
+            </Button>
+          </Popconfirm>
+        );
+      },
+    },
   ];
+
+  const handleCancel = async (orderId: string) => {
+    try {
+      await cancelOrderAPI(orderId, 'Cancelled by customer');
+      message.success('Order cancelled');
+      fetchOrders();
+    } catch (error: any) {
+      message.error(error?.response?.data?.message || 'Cancel order failed');
+    }
+  };
 
   return (
     <div className={styles.container}>

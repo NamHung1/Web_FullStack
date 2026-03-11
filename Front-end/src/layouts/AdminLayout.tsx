@@ -24,6 +24,10 @@ const AdminLayout = () => {
           <Menu.Item key="4">
             <Link to="/admin/orders">Orders</Link>
           </Menu.Item>
+
+          <Menu.Item key="5">
+            <Link to="/admin/categories">Categories</Link>
+          </Menu.Item>
         </Menu>
       </Sider>
 

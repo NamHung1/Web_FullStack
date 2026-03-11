@@ -15,6 +15,7 @@ import Dashboard from '../admin/Dashboard/Dashboard';
 import ManageUsers from '../admin/ManageUsers/ManageUsers';
 import ManageProducts from '../admin/ManageProducts/ManageProducts';
 import ManageOrders from '../admin/ManageOrders/ManageOrders';
+import ManageCategories from '../admin/ManageCategories/ManageCategories';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 export const router = createBrowserRouter([
@@ -52,7 +53,11 @@ export const router = createBrowserRouter([
 
       {
         path: '/checkout',
-        element: <Checkout />,
+        element: (
+          <ProtectedRoute>
+            <Checkout />
+          </ProtectedRoute>
+        ),
       },
 
       {
@@ -92,6 +97,11 @@ export const router = createBrowserRouter([
       {
         path: 'orders',
         element: <ManageOrders />,
+      },
+
+      {
+        path: 'categories',
+        element: <ManageCategories />,
       },
     ],
   },
