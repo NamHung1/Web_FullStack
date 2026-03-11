@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { List, Button, Image, message, Empty, Spin, Card } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
-import axios from '../../api/axios';
+import { getCartAPI, removeFromCartAPI } from '../../api/cart.api';
 import styles from './Cart.module.css';
 
 interface Product {
@@ -16,6 +16,12 @@ interface CartItem {
   quantity: number;
 }
 
+interface CartResponseItem {
+  productId: Product;
+  quantity: number;
+}
+
+
 export default function Cart() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,11 +30,13 @@ export default function Cart() {
 
   const fetchCart = async () => {
     try {
-      const res = await axios.get('/cart', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const data = await getCartAPI();
+      const normalizedItems = (data?.items || []).map((item: CartResponseItem) => ({
+        product: item.productId,
+        quantity: item.quantity,
+      }));
 
-      setItems(res.data.items);
+      setItems(normalizedItems);
     } catch (err) {
       console.error(err);
       message.error('Failed to load cart');
@@ -40,22 +48,21 @@ export default function Cart() {
   useEffect(() => {
     if (!token) {
       message.warning('Please login to view cart');
+      setLoading(false);
       return;
     }
 
     fetchCart();
-  }, []);
+  }, [token]);
 
   const removeItem = async (productId: string) => {
     try {
-      await axios.delete(`/cart/${productId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await removeFromCartAPI(productId);
 
       setItems((prev) => prev.filter((item) => item.product._id !== productId));
 
       message.success('Item removed');
-    } catch (err) {
+    } catch {
       message.error('Remove failed');
     }
   };
