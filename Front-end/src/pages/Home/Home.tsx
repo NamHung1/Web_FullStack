@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import ProductList from '../../components/ProductList/ProductList';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import { getProductsAPI, searchProductsAPI } from '../../api/product.api';
@@ -17,6 +17,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [searchValue, setSearchValue] = useState('');
 
   const fetchProducts = useCallback(async (categoryId?: string) => {
     try {
@@ -38,16 +39,18 @@ export default function Home() {
 
   const handleSearch = useCallback(
     async (value: string) => {
+      const normalizedValue = value.trim();
+      setSearchValue(value);
       setLoading(true);
       try {
-        if (!value.trim()) {
+        if (!normalizedValue) {
           const data = await getProductsAPI(selectedCategory || undefined);
           setProducts(data);
           return;
         }
 
         const data = await searchProductsAPI(
-          value,
+          normalizedValue,
           selectedCategory || undefined,
         );
         setProducts(data);
@@ -65,14 +68,35 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const data = await getProductsAPI(categoryId || undefined);
-      setProducts(data);
+      if (searchValue.trim()) {
+        const data = await searchProductsAPI(searchValue.trim(), categoryId || undefined);
+        setProducts(data);
+      } else {
+        const data = await getProductsAPI(categoryId || undefined);
+        setProducts(data);
+      }
     } catch {
       message.error('Failed to filter products by category');
     } finally {
       setLoading(false);
     }
   };
+
+  // Nếu không tìm thấy sản phẩm, hàm `emptyMessage` sẽ tìm kiếm tên sản phẩm theo tên, category, hoac "không có sản phẩm nào"
+  const emptyMessage = useMemo(() => {
+    if (searchValue.trim()) {
+      return `There are no products found for "${searchValue.trim()}"`;
+    }
+
+    if (selectedCategory) {
+      const categoryName =
+        categories.find((category) => category._id === selectedCategory)?.name ||
+        'choosed';
+      return `There are no products found for "${categoryName}"`;
+    }
+
+    return 'Chưa có sản phẩm nào';
+  }, [categories, searchValue, selectedCategory]);
 
   return (
     <div className={styles.container}>
@@ -83,7 +107,7 @@ export default function Home() {
         onCategoryChange={handleCategoryChange}
       />
 
-      <ProductList products={products} loading={loading} />
+      <ProductList products={products} loading={loading} emptyMessage={emptyMessage} />
     </div>
   );
 }

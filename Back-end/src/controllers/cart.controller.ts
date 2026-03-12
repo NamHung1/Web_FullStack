@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 export const getCart = async (req: Request, res: Response) => {
   const userId = (req as any).user.id;
 
-  let cart = await Cart.findOne({ userId }).populate("items.productId");
+  let cart = await Cart.findOne({ userId }).populate('items.productId');
 
   if (!cart) {
     cart = await Cart.create({ userId, items: [] });
@@ -26,7 +26,7 @@ export const addToCart = async (req: Request, res: Response) => {
   }
 
   const existingItem = (cart.items as any[]).find(
-    (item) => item.productId?.toString() === productId
+    (item) => item.productId?.toString() === productId,
   );
 
   if (existingItem) {
@@ -40,7 +40,7 @@ export const addToCart = async (req: Request, res: Response) => {
 
   await cart.save();
 
-  const updatedCart = await Cart.findById(cart._id).populate("items.productId");
+  const updatedCart = await Cart.findById(cart._id).populate('items.productId');
 
   res.json(updatedCart);
 };
@@ -56,12 +56,47 @@ export const removeFromCart = async (req: Request, res: Response) => {
   }
 
   (cart.items as any[]) = (cart.items as any[]).filter(
-    (item) => item.productId?.toString() !== productId
+    (item) => item.productId?.toString() !== productId,
   );
 
   await cart.save();
 
-  const updatedCart = await Cart.findById(cart._id).populate("items.productId");
+  const updatedCart = await Cart.findById(cart._id).populate('items.productId');
+
+  res.json(updatedCart);
+};
+
+export const updateCartQuantity = async (req: Request, res: Response) => {
+  const userId = (req as any).user.id;
+  const { productId } = req.params;
+  const quantity = Number(req.body.quantity);
+
+  if (!Number.isInteger(quantity) || quantity < 1) {
+    {
+      return res
+        .status(400)
+        .json({ message: 'The quantity must be a positive integer' });
+    }
+  }
+
+  const cart = await Cart.findOne({ userId });
+
+  if (!cart) {
+    return res.status(404).json({ message: 'Cart not found' });
+  }
+
+  const item = (cart.items as any[]).find(
+    (item) => item.productId?.toString() === productId,
+  );
+
+  if (!item) {
+    return res.status(404).json({ message: 'No product found in the cart' });
+  }
+
+  item.quantity = quantity;
+  await cart.save();
+
+  const updatedCart = await Cart.findById(cart._id).populate('items.productId');
 
   res.json(updatedCart);
 };

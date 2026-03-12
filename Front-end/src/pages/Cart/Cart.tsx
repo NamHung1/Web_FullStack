@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { List, Button, Image, message, Empty, Spin, Card } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
-import { getCartAPI, removeFromCartAPI } from '../../api/cart.api';
+import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
+import { getCartAPI, removeFromCartAPI, updateCartItemQuantityAPI } from '../../api/cart.api';
 import { useCart } from '../../hooks/useCart';
 import styles from './Cart.module.css';
 import { useNavigate } from 'react-router-dom';
@@ -23,10 +23,10 @@ interface CartResponseItem {
   quantity: number;
 }
 
-
 export default function Cart() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
   const { refreshCartCount } = useCart();
 
   const navigate = useNavigate()
@@ -74,6 +74,31 @@ export default function Cart() {
       message.success('Item removed');
     } catch {
       message.error('Remove failed');
+    }
+  };
+
+  // Chính sửa số lượng sản phẩm
+  const updateQuantity = async (productId: string, nextQuantity: number) => {
+    if (nextQuantity < 1) {
+      return;
+    }
+
+    setUpdatingId(productId);
+    try {
+      await updateCartItemQuantityAPI(productId, nextQuantity);
+
+      setItems((prev) =>
+        prev.map((item) =>
+          item.product._id === productId
+            ? { ...item, quantity: nextQuantity }
+            : item,
+        ),
+      );
+      refreshCartCount();
+    } catch {
+      message.error('Update quantity failed');
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -132,7 +157,26 @@ export default function Cart() {
 
                     <p className={styles.price}>${item.product.price}</p>
 
-                    <p>Quantity: {item.quantity}</p>
+                    <div className={styles.quantityControls}>
+                      <span>Quantity:</span>
+                      <Button
+                        size="small"
+                        icon={<MinusOutlined />}
+                        disabled={item.quantity <= 1 || updatingId === item.product._id}
+                        onClick={() =>
+                          updateQuantity(item.product._id, item.quantity - 1)
+                        }
+                      />
+                      <strong>{item.quantity}</strong>
+                      <Button
+                        size="small"
+                        icon={<PlusOutlined />}
+                        disabled={updatingId === item.product._id}
+                        onClick={() =>
+                          updateQuantity(item.product._id, item.quantity + 1)
+                        }
+                      />
+                    </div>
                   </div>
 
                   <Button

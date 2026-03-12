@@ -105,3 +105,9 @@
 
   margin-top: 100px;
 }
+
+.quantityControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
