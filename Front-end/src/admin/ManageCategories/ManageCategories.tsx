@@ -7,6 +7,7 @@ import {
   type Category,
   updateCategoryAPI,
 } from '../../api/category.api';
+import styles from './ManageCategories.module.css';
 
 interface CategoryFormValues {
   name: string;
@@ -103,6 +104,7 @@ export default function ManageCategories() {
         rowKey="_id"
         dataSource={categories}
         loading={loading}
+        className={styles.table}
         columns={[
           {
             title: 'Category name',

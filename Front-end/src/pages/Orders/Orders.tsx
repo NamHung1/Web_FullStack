@@ -96,7 +96,14 @@ export default function Orders() {
   return (
     <div className={styles.container}>
       <h1>Your Orders</h1>
-      <Table dataSource={orders} columns={columns} rowKey="_id" loading={loading} />
+      <Table
+        dataSource={orders}
+        columns={columns}
+        rowKey="_id"
+        loading={loading}
+        scroll={{ x: 700 }}
+        pagination={{ pageSize: 8, showSizeChanger: false }}
+      />
     </div>
   );
 }

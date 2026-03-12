@@ -1,4 +1,13 @@
 .content {
-  padding: 20px;
-  min-height: 100vh;
+  min-height: calc(100vh - 76px);
+  width: min(1200px, 100% - 32px);
+  margin: 0 auto;
+  padding: 24px 0 40px;
+}
+
+@media (max-width: 768px) {
+  .content {
+    width: min(1200px, 100% - 20px);
+    padding: 16px 0 28px;
+  }
 }
