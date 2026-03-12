@@ -32,3 +32,11 @@ export const updateOrderStatusAPI = async (
   const res = await api.patch(`/orders/${id}/status`, { status });
   return res.data;
 };
+
+export const adminUpdateOrderStatusAPI = async (
+  id: string,
+  status: 'pending' | 'completed' | 'cancelled',
+) => {
+  const res = await api.patch(`/admin/orders/${id}/status`, { status });
+  return res.data;
+};

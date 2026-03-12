@@ -3,3 +3,18 @@
   background: #fff;
   min-height: 100vh;
 }
+
+.title {
+  color: #fff;
+}
+
+.logout {
+  width: 150px;
+  background: red;
+  color: #fff;
+  font-weight: bolder;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+}

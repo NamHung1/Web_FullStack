@@ -1,5 +1,5 @@
 import { Table, Tag, Select, message } from 'antd';
-import styles from './ManageOrders.module.css'
+import styles from './ManageOrders.module.css';
 import { updateOrderStatusAPI } from '../../api/order.api';
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
@@ -33,11 +33,31 @@ export default function ManageOrders() {
     }
   };
 
+  const handleStatusChange = async (
+    orderId: string,
+    status: 'pending' | 'completed' | 'cancelled',
+  ) => {
+    try {
+      await updateOrderStatusAPI(orderId, status);
+      setOrders((prev) =>
+        prev.map((order) =>
+          order._id === orderId ? { ...order, status } : order,
+        ),
+      );
+      message.success('Order status updated');
+    } catch (error: any) {
+      message.error(
+        error?.response?.data?.message || 'Failed to update status',
+      );
+    }
+  };
+
   const columns = [
     {
       title: 'User',
       dataIndex: 'userId',
-      render: (user: { name: string; email: string }) => `${user.name} (${user.email})`,
+      render: (user: { name: string; email: string }) =>
+        `${user.name} (${user.email})`,
     },
     // {
     //   title: 'Product name',
@@ -53,7 +73,17 @@ export default function ManageOrders() {
       title: 'Status',
       dataIndex: 'status',
       render: (status: Order['status']) => (
-        <Tag color={status === 'completed' ? 'green' : status === 'cancelled' ? 'red' : 'orange'}>{status}</Tag>
+        <Tag
+          color={
+            status === 'completed'
+              ? 'green'
+              : status === 'cancelled'
+                ? 'red'
+                : 'orange'
+          }
+        >
+          {status}
+        </Tag>
       ),
     },
     {
@@ -79,20 +109,15 @@ export default function ManageOrders() {
     },
   ];
 
-  const handleStatusChange = async (orderId: string, status: 'pending' | 'completed' | 'cancelled') => {
-    try {
-      await updateOrderStatusAPI(orderId, status);
-      setOrders((prev) => prev.map((order) => (order._id === orderId ? { ...order, status } : order)));
-      message.success('Order status updated');
-    } catch (error: any) {
-      message.error(error?.response?.data?.message || 'Failed to update status');
-    }
-  };
-
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Manage Orders</h1>
-      <Table dataSource={orders} columns={columns} rowKey="_id" loading={loading} />
+      <Table
+        dataSource={orders}
+        columns={columns}
+        rowKey="_id"
+        loading={loading}
+      />
     </div>
   );
 }
