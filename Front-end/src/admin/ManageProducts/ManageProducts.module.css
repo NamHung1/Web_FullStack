@@ -1,17 +1,55 @@
 .container {
-  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .header {
   display: flex;
-
   justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 
-  margin-bottom: 20px;
+.header h1 {
+  margin: 0;
+  font-size: clamp(24px, 3.8vw, 32px);
+  color: #1a2a44;
 }
 
 .actions {
   display: flex;
-
   gap: 10px;
+  flex-wrap: wrap;
+}
+
+.table :global(.ant-table-wrapper) {
+  overflow-x: auto;
+}
+
+.product_edit {
+  background: #0088ff;
+}
+
+.product_delete {
+  background: #f04438;
+  color: white;
+}
+
+.product_create {
+  background: #5cb85c;
+  color: white;
+}
+
+.product_edit:hover {
+  background: white !important;
+  border-color: #0088ff !important;
+  color: #2197ff !important;
+}
+
+.product_create:hover {
+  background: white !important;
+  border-color: #67b867 !important;
+  color: #67b867 !important;
 }

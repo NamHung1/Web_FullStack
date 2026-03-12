@@ -35,6 +35,7 @@ export default function SearchBar({
         placeholder="Search product..."
         value={value}
         onChange={(e) => setValue(e.target.value)}
+        className={styles.searchInput}
       />
       <Select
         value={selectedCategory || 'all'}

@@ -1,0 +1,56 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(24px, 3.8vw, 32px);
+  color: #1a2a44;
+}
+
+.table :global(.ant-table-wrapper) {
+  overflow-x: auto;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cate_create {
+  background: #5cb85c;
+  color: white;
+}
+
+.cate_create:hover {
+  background: white !important;
+  border-color: #67b867 !important;
+  color: #67b867 !important;
+}
+
+.cate_edit {
+  background: #0088ff;
+  color: white;
+}
+
+.cate_edit:hover {
+  background: white !important;
+  border-color: #0088ff !important;
+  color: #2197ff !important;
+}
+
+.cate_delete {
+  background: #f04438;
+  color: white;
+}

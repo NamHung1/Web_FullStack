@@ -137,7 +137,8 @@ export default function ManageProducts() {
       closeModal();
     } catch (error: unknown) {
       const errorMessage =
-        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ||
         `Failed to ${editingProduct ? 'update' : 'create'} product`;
       message.error(errorMessage);
     } finally {
@@ -174,10 +175,10 @@ export default function ManageProducts() {
       title: 'Action',
       render: (record: Product) => (
         <div className={styles.actions}>
-          <Button type="primary" onClick={() => openEditModal(record)}>
+          <Button type="primary" onClick={() => openEditModal(record)} className={styles.product_edit}>
             Edit
           </Button>
-          <Button danger onClick={() => deleteProduct(record._id)}>
+          <Button danger onClick={() => deleteProduct(record._id)} className={styles.product_delete}>
             Delete
           </Button>
         </div>
@@ -190,16 +191,19 @@ export default function ManageProducts() {
       <div className={styles.header}>
         <h1>Manage Products</h1>
 
-        <Button type="primary" onClick={openCreateModal}>
+        <Button type="primary" onClick={openCreateModal} className={styles.product_create}>
           Add Product
         </Button>
       </div>
 
       <Table
+        className={styles.table}
         dataSource={products}
         columns={columns}
         rowKey="_id"
         loading={loading}
+        scroll={{ x: 850 }}
+        pagination={{ pageSize: 8, showSizeChanger: false }}
       />
 
       <Modal

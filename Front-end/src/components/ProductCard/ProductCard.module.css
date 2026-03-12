@@ -1,8 +1,8 @@
 .card {
   border-radius: 16px;
   overflow: hidden;
-  border: 1px solid #e6edf7;
-  box-shadow: 0 12px 24px rgba(21, 47, 97, 0.08);
+  border: 1px solid #000000;
+  box-shadow: 12px 12px 24px rgba(21, 47, 97, 0.4);
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
@@ -10,13 +10,12 @@
 
 .card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 16px 28px rgba(21, 47, 97, 0.12);
+  border: 1px solid #1677ff;
+  box-shadow: 0 16px 28px rgba(21, 47, 97, 0.5);
 }
 
 .card img {
-
   height: 200px;
-
   width: 100%;
   object-fit: cover;
 }

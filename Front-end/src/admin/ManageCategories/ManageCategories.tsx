@@ -92,10 +92,10 @@ export default function ManageCategories() {
   };
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-        <h1>Manage Categories</h1>
-        <Button type="primary" onClick={openCreateModal}>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Manage Categories</h1>
+        <Button type="primary" onClick={openCreateModal} className={styles.cate_create}>
           Add Category
         </Button>
       </div>
@@ -105,6 +105,8 @@ export default function ManageCategories() {
         dataSource={categories}
         loading={loading}
         className={styles.table}
+        scroll={{ x: 700 }}
+        pagination={{ pageSize: 8, showSizeChanger: false }}
         columns={[
           {
             title: 'Category name',
@@ -113,8 +115,8 @@ export default function ManageCategories() {
           {
             title: 'Action',
             render: (record: Category) => (
-              <div style={{ display: 'flex', gap: 8 }}>
-                <Button type="primary" onClick={() => openEditModal(record)}>
+              <div className={styles.actions}>
+                <Button type="primary" onClick={() => openEditModal(record)} className={styles.cate_edit}>
                   Edit
                 </Button>
                 <Popconfirm
@@ -122,7 +124,7 @@ export default function ManageCategories() {
                   description="Are you sure to delete this category?"
                   onConfirm={() => handleDelete(record._id)}
                 >
-                  <Button danger>Delete</Button>
+                  <Button danger className={styles.cate_delete}>Delete</Button>
                 </Popconfirm>
               </div>
             ),

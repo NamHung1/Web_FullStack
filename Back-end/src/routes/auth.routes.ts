@@ -9,6 +9,18 @@ import User from "../models/User";
 const router = Router();
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
 
+const ensureStrategy = (strategy: string) => (req: any, res: any, next: any) => {
+  const activeStrategy = (passport as any)._strategy(strategy);
+
+  if (!activeStrategy) {
+    return res.status(503).json({
+      message: `${strategy} login is not configured. Please check environment variables.`
+    });
+  }
+
+  next();
+};
+
 /*
  NORMAL LOGIN
 */
@@ -44,17 +56,28 @@ router.get("/me", authMiddleware, async (req, res) => {
   }
 });
 
+router.get("/oauth-providers", (_req, res) => {
+  const providers = {
+    google: Boolean((passport as any)._strategy("google")),
+    facebook: Boolean((passport as any)._strategy("facebook"))
+  };
+
+  res.json(providers);
+});
+
 /*
  GOOGLE LOGIN
 */
 
 router.get(
   "/google",
+  ensureStrategy("google"),
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
 router.get(
   "/google/callback",
+  ensureStrategy("google"),
   passport.authenticate("google", { session: false }),
   (req: any, res) => {
 
@@ -72,11 +95,13 @@ router.get(
 
 router.get(
   "/facebook",
-  passport.authenticate("facebook", { scope: ["email"] })
+  ensureStrategy("facebook"),
+  passport.authenticate("facebook")
 );
 
 router.get(
   "/facebook/callback",
+  ensureStrategy("facebook"),
   passport.authenticate("facebook", { session: false }),
   (req: any, res) => {
 
