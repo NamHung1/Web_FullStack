@@ -78,11 +78,11 @@ export default function ManageOrders() {
         const selectedStatus = draftStatuses[record._id] || record.status;
 
         return (
-          <Space>
+          <Space className={styles.statusControls}>
             <Select
               size="small"
               value={selectedStatus}
-              style={{ width: 140 }}
+              className={styles.statusSelect}
               options={[
                 { value: 'pending', label: 'pending' },
                 { value: 'completed', label: 'completed' },
@@ -113,7 +113,15 @@ export default function ManageOrders() {
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Manage Orders</h1>
-      <Table dataSource={orders} columns={columns} rowKey="_id" loading={loading} />
+      <Table
+        className={styles.table}
+        dataSource={orders}
+        columns={columns}
+        rowKey="_id"
+        loading={loading}
+        scroll={{ x: 900 }}
+        pagination={{ pageSize: 8, showSizeChanger: false }}
+      />
     </div>
   );
 }

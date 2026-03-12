@@ -1,13 +1,20 @@
 .container {
-
-  padding: 30px;
-
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 .title {
+  font-size: clamp(24px, 3.8vw, 32px);
+  margin: 0;
+  color: #1a2a44;
+}
 
-  font-size: 26px;
+.table :global(.ant-table-wrapper) {
+  overflow-x: auto;
+}
 
-  margin-bottom: 20px;
-
+.user_delete {
+  background: #f04438;
+  color: white;
 }

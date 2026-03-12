@@ -61,7 +61,7 @@ export default function ManageUsers() {
     {
       title: "Action",
       render: (record: User) => (
-        <Button danger onClick={() => deleteUser(record._id)}>Delete</Button>
+        <Button danger onClick={() => deleteUser(record._id)} className={styles.user_delete}>Delete</Button>
       )
     }
 
@@ -74,15 +74,13 @@ export default function ManageUsers() {
       <h1 className={styles.title}>Manage Users</h1>
 
       <Table
-
+        className={styles.table}
         dataSource={users}
-
         columns={columns}
-
         loading={loading}
-
         rowKey="_id"
-
+        scroll={{ x: 700 }}
+        pagination={{ pageSize: 8, showSizeChanger: false }}
       />
 
     </div>

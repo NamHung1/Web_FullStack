@@ -1,9 +1,32 @@
 .container {
-  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .title {
-  font-size: 26px;
+  margin: 0;
+  font-size: clamp(24px, 3.8vw, 32px);
+  color: #1a2a44;
+}
 
-  margin-bottom: 20px;
+.table :global(.ant-table-wrapper) {
+  overflow-x: auto;
+}
+
+.statusControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.statusSelect {
+  width: 140px;
+}
+
+@media (max-width: 768px) {
+  .statusSelect {
+    width: 100%;
+  }
 }

@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { List, Button, Image, message, Empty, Spin, Card } from 'antd';
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
-import { getCartAPI, removeFromCartAPI, updateCartItemQuantityAPI } from '../../api/cart.api';
+import {
+  getCartAPI,
+  removeFromCartAPI,
+  updateCartItemQuantityAPI,
+} from '../../api/cart.api';
 import { useCart } from '../../hooks/useCart';
 import styles from './Cart.module.css';
 import { useNavigate } from 'react-router-dom';
@@ -29,7 +33,7 @@ export default function Cart() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const { refreshCartCount } = useCart();
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const token = localStorage.getItem('token');
 
@@ -37,10 +41,12 @@ export default function Cart() {
   const fetchCart = async () => {
     try {
       const data = await getCartAPI();
-      const normalizedItems = (data?.items || []).map((item: CartResponseItem) => ({
-        product: item.productId,
-        quantity: item.quantity,
-      }));
+      const normalizedItems = (data?.items || []).map(
+        (item: CartResponseItem) => ({
+          product: item.productId,
+          quantity: item.quantity,
+        }),
+      );
 
       setItems(normalizedItems);
       refreshCartCount();
@@ -162,7 +168,9 @@ export default function Cart() {
                       <Button
                         size="small"
                         icon={<MinusOutlined />}
-                        disabled={item.quantity <= 1 || updatingId === item.product._id}
+                        disabled={
+                          item.quantity <= 1 || updatingId === item.product._id
+                        }
                         onClick={() =>
                           updateQuantity(item.product._id, item.quantity - 1)
                         }
