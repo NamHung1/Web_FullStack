@@ -1,13 +1,36 @@
 .card {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e6edf7;
+  box-shadow: 0 12px 24px rgba(21, 47, 97, 0.08);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
 
-  width: 240px;
-
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 28px rgba(21, 47, 97, 0.12);
 }
 
 .card img {
 
   height: 200px;
 
+  width: 100%;
   object-fit: cover;
+}
 
+.card h3 {
+  margin: 0 0 6px;
+  font-size: 17px;
+  line-height: 1.35;
+  min-height: 46px;
+}
+
+.card p {
+  margin: 0 0 14px;
+  color: #1677ff;
+  font-size: 18px;
+  font-weight: 700;
 }

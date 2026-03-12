@@ -38,7 +38,7 @@ export default function SearchBar({
       />
       <Select
         value={selectedCategory || 'all'}
-        style={{ width: 220 }}
+        className={styles.categorySelect}
         onChange={(nextValue) =>
           onCategoryChange?.(nextValue === 'all' ? '' : nextValue)
         }

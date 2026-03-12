@@ -1,19 +1,19 @@
 .container {
   display: flex;
-
   justify-content: center;
-
   align-items: center;
-
-  height: 80vh;
+  min-height: 78vh;
+  padding: 16px;
 }
 
 .card {
-  width: 350px;
+  width: min(450px, 100%);
+  border-radius: 16px;
+  border: 1px solid #e4ebf6;
+  box-shadow: 0 12px 28px rgba(18, 46, 97, 0.08);
 }
 
 .text {
   margin-top: 15px;
-
   text-align: center;
 }

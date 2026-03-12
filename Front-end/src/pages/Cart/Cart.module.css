@@ -1,113 +1,100 @@
 .container {
-  padding: 40px;
-
+  padding: clamp(8px, 2vw, 22px);
   max-width: 1200px;
-
   margin: auto;
 }
 
 .title {
-  font-size: 30px;
-
-  margin-bottom: 30px;
-
-  font-weight: 600;
+  font-size: clamp(26px, 4vw, 34px);
+  margin-bottom: 22px;
+  font-weight: 700;
 }
 
 .wrapper {
   display: grid;
-
-  grid-template-columns: 2fr 1fr;
-
-  gap: 30px;
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  gap: 24px;
 }
 
 .list {
   display: flex;
-
   flex-direction: column;
-
-  gap: 15px;
+  gap: 14px;
 }
 
 .itemCard {
-  border-radius: 10px;
-
-  transition: 0.25s;
-}
-
-.itemCard:hover {
-  transform: translateY(-3px);
-
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  border: 1px solid #e5ebf6;
 }
 
 .item {
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
-
-  gap: 20px;
+  gap: 16px;
 }
 
 .image {
-  border-radius: 6px;
+  border-radius: 10px;
 }
 
 .info {
   flex: 1;
+  min-width: 0;
+}
+
+.info h3 {
+  margin: 0 0 6px;
 }
 
 .price {
   color: #1677ff;
-
-  font-weight: 600;
+  font-weight: 700;
+  margin: 0 0 10px;
 }
 
 .summary {
   position: sticky;
-
-  top: 100px;
+  top: 88px;
+  height: fit-content;
 }
 
 .totalPrice {
-  font-size: 20px;
-
+  font-size: 22px;
   font-weight: bold;
-
   margin: 10px 0;
 }
 
-.checkout {
-  margin-top: 10px;
-}
-
-.loading {
-  display: flex;
-
-  justify-content: center;
-
-  align-items: center;
-
-  height: 50vh;
-}
-
-.empty {
-  margin-top: 100px;
-
-  text-align: center;
-}
-
+.loading,
+.empty,
 .loginRequired {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   text-align: center;
-
-  margin-top: 100px;
+  min-height: 50vh;
 }
 
 .quantityControls {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .summary {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }

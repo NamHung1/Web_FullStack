@@ -1,45 +1,36 @@
 .navbar {
   display: flex;
-
   justify-content: space-between;
-
   align-items: center;
-
-  padding: 15px 40px;
-
-  background: white;
-
-  border-bottom: 1px solid #eee;
-
+  gap: 14px;
+  padding: 14px clamp(14px, 3vw, 34px);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #e6ecf5;
   position: sticky;
-
   top: 0;
-
   z-index: 100;
 }
 
 .logo {
-  font-size: 22px;
-
-  font-weight: bold;
-
+  font-size: clamp(16px, 2.4vw, 22px);
+  font-weight: 800;
+  letter-spacing: 0.4px;
   color: #1677ff;
 }
 
 .links {
   display: flex;
-
   align-items: center;
-
-  gap: 25px;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .links a {
-  color: #333;
-
-  font-weight: 500;
-
-  transition: 0.2s;
+  color: #344054;
+  font-weight: 600;
+  transition: color 0.2s;
 }
 
 .links a:hover {
@@ -48,14 +39,49 @@
 
 .cartIcon {
   font-size: 22px;
-
   cursor: pointer;
 }
 
 .userBox {
   display: flex;
-
   align-items: center;
-
   gap: 10px;
+  background: #f8faff;
+  border: 1px solid #dbe5f4;
+  border-radius: 999px;
+  padding: 5px 8px;
+}
+
+.userBox span {
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .links {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .userBox {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .links {
+    gap: 10px;
+  }
+
+  .userBox span {
+    max-width: 70px;
+  }
 }

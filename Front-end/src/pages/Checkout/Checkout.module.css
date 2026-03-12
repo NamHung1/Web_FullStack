@@ -1,11 +1,14 @@
 .container {
   display: flex;
   justify-content: center;
-  padding: 40px;
+  padding: clamp(10px, 3vw, 28px);
 }
 
 .card {
-  width: 400px;
+  width: min(560px, 100%);
+  border-radius: 16px;
+  border: 1px solid #e5ebf5;
+  box-shadow: 0 12px 30px rgba(19, 47, 96, 0.08);
 }
 
 .orderList {
@@ -13,23 +16,18 @@
 }
 
 .total {
-  font-size: 18px;
-
-  font-weight: 600;
-
+  font-size: 20px;
+  font-weight: 700;
   margin-bottom: 16px;
+  color: #1677ff;
 }
 
-.loading {
-  display: flex;
-
-  justify-content: center;
-
-  margin-top: 80px;
-}
-
+.loading,
 .empty {
-  margin-top: 80px;
-
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 70px;
 }
