@@ -1,56 +1,64 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Badge, Button, Avatar } from 'antd';
 import { ShoppingCartOutlined, UserOutlined } from '@ant-design/icons';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useCart } from '../../hooks/useCart';
+import { useAuth } from '../../hooks/useAuth';
 
 import styles from './Navbar.module.css';
 
-import { useCart } from '../../hooks/useCart';
 import api from '../../api/axios';
-
-interface User {
-  name: string;
-  email: string;
-}
 
 export default function Navbar() {
   const { cartCount, refreshCartCount } = useCart();
+  const { user, token, setAuth, logout } = useAuth();
 
   const navigate = useNavigate();
 
-  const [user, setUser] = useState<User | null>(null);
-
-  const token = localStorage.getItem('token');
-
   useEffect(() => {
-    if (token) {
-      api
-        .get('/auth/me')
-        .then((res) => {
-          setUser(res.data);
-          refreshCartCount();
-        })
-        .catch(() => {
-          localStorage.removeItem('token');
-          setUser(null);
-        });
+    if (!token) {
       return;
     }
-  }, [token, refreshCartCount]);
+
+    if (user) {
+      return;
+    }
+    let cancelled = false;
+
+    api
+      .get('/auth/me')
+      .then((res) => {
+        if (cancelled) {
+          return;
+        }
+
+        setAuth(res.data, token);
+      })
+      .catch(() => {
+        if (cancelled) {
+          return;
+        }
+
+        logout();
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token, user, setAuth, logout, refreshCartCount]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    logout();
     navigate('/login');
   };
 
   return (
     <div className={styles.navbar}>
       <Link to="/" className={styles.logo}>
-        MyShop
+        BÁCH HÓA CÔNG NGHỆ
       </Link>
 
       <div className={styles.links}>
-        <Link to="/">Home</Link>
 
         {user && <Link to="/orders">Orders</Link>}
 

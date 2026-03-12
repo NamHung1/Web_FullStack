@@ -65,6 +65,8 @@ export default function ProductDetail() {
 
         {categoryName ? <p>Category: {categoryName}</p> : null}
 
+        <p>Stock: {product.stock}</p>
+
         <p className={styles.price}>${product.price}</p>
 
         <p>{product.description}</p>
