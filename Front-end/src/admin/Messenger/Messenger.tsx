@@ -7,6 +7,14 @@ import { useChatEvents } from "../../hooks/useChatEvents";
 import styles from "./Messenger.module.css";
 import { SendOutlined } from "@ant-design/icons";
 
+const getMessageUserId = (user: ChatMessage["sender"] | ChatMessage["receiver"] | string) => {
+  if (!user) {
+    return "";
+  }
+
+  return typeof user === "string" ? user : user._id;
+}
+
 const Messenger = () => {
   const admin = useAuthStore((state) => state.user);
   const [users, setUsers] = useState<ChatUser[]>([]);
@@ -90,7 +98,9 @@ const Messenger = () => {
       <Card className={styles.chatPanel} title={activeUser ? `Chat with ${activeUser.name}` : " "}>
         <div className={styles.messageList}>
           {messages.map((item) => {
-            const mine = item.sender._id === admin?._id;
+            const senderId = getMessageUserId(item.sender);
+            const receiverId = getMessageUserId(item.receiver);
+            const mine = senderId === admin?._id || (item.sender.role === "admin" && receiverId === activeUserId);
             return (
               <div key={item._id} className={mine ? styles.mine : styles.their}>
                 <span>{item.content}</span>
