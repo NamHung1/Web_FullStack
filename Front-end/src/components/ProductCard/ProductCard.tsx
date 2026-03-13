@@ -49,7 +49,7 @@ export default function ProductCard({ product }: Props) {
 
       <p>${product.price}</p>
 
-      <Button type="primary" onClick={handleAddToCart}>
+      <Button type="primary" onClick={handleAddToCart} className={styles.add_to_cart}>
         Add to cart
       </Button>
     </Card>

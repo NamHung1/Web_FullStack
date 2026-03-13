@@ -1,4 +1,4 @@
-import { Form, Input, Button, Card, message } from 'antd';
+import { Form, Input, Button, Card, Divider, message } from 'antd';
 import { FacebookOutlined, GoogleOutlined } from '@ant-design/icons'
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './Login.module.css';
@@ -86,6 +86,8 @@ export default function Login() {
             Login
           </Button>
         </Form>
+
+        <Divider className={styles.divider}>Other</Divider>
 
         {(oauthProviders.google || oauthProviders.facebook) && (
           <div className={styles.oauthSection}>

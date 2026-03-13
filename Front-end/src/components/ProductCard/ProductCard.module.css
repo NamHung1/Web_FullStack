@@ -33,3 +33,20 @@
   font-size: 18px;
   font-weight: 700;
 }
+
+.add_to_cart {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 0;
+  border-radius: 14px;
+  font-weight: bold;
+}
+
+.add_to_cart:hover {
+  color: #1677ff !important;
+  background: #fff !important;
+  box-shadow: 5px 5px 10px rgba(20, 20, 20, 0.8);
+}
