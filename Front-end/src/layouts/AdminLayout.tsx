@@ -1,5 +1,8 @@
-import { Layout, Menu, Button, Typography } from 'antd';
+import { useCallback, useEffect, useState } from 'react';
+import { Layout, Menu, Button, Typography, Badge, message } from 'antd';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { chatApi } from '../api/chat.api';
+import { useChatEvents } from '../hooks/useChatEvents';
 import styles from './AdminLayout.module.css';
 
 const { Sider, Content } = Layout;
@@ -8,6 +11,23 @@ const { Title } = Typography;
 const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [chatUnread, setChatUnread] = useState(0);
+
+  const loadUnread = useCallback(async () => {
+    const data = await chatApi.getUnreadCount();
+    setChatUnread(data.unreadCount);
+  }, []);
+
+  useChatEvents(
+    useCallback(() => {
+      loadUnread();
+      message.info('Admin: There is a new message from user');
+    }, [loadUnread])
+  );
+
+  useEffect(() => {
+    loadUnread();
+  }, [loadUnread]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -42,6 +62,14 @@ const AdminLayout = () => {
 
           <Menu.Item key="categories">
             <Link to="/admin/categories">Categories</Link>
+          </Menu.Item>
+
+          <Menu.Item key="chat">
+            <Link to="/admin/chat">
+              <Badge count={chatUnread} size="small" offset={[8, 0]}>
+                <span className={styles.menu_text}>Chat</span>
+              </Badge>
+            </Link>
           </Menu.Item>
 
           <Menu.Item key="logout">

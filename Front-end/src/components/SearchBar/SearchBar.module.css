@@ -2,10 +2,10 @@
   max-width: 900px;
   margin: 8px auto 16px;
   padding: 14px;
-  background: #fff;
-  border: 1px solid #e4ebf5;
+  background: #e6e4e4;
+  border: none;
   border-radius: 14px;
-  box-shadow: 0 10px 24px rgba(20, 43, 95, 0.06);
+  box-shadow: 0 10px 24px rgba(20, 43, 95, 0.4) !important;
   display: grid;
   grid-template-columns: 1fr 220px;
   gap: 12px;
