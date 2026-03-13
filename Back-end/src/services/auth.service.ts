@@ -22,7 +22,7 @@ export const registerUser = async (
     password: hashed
   });
 
-  const token = generateToken(user._id.toString());
+  const token = generateToken(user._id.toString(), user.role);
 
   return { user, token };
 };
@@ -57,7 +57,7 @@ export const loginUser = async (
     throw new Error("Invalid password");
   }
 
-  const token = generateToken(user._id.toString());
+  const token = generateToken(user._id.toString(), user.role);
 
   return { user, token };
 };

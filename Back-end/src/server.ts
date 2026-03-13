@@ -14,6 +14,7 @@ import orderRoutes from "./routes/order.routes";
 import cartRoutes from "./routes/cart.routes";
 import categoryRoutes from "./routes/categoty.route";
 import adminRoutes from "./routes/admin.routes";
+import chatRoutes from "./routes/chat.routes";
 import { seedAdmin } from "./config/seedAdmin";
 
 dotenv.config();
@@ -51,6 +52,8 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/chat", chatRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 

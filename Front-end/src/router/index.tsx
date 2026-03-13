@@ -18,6 +18,7 @@ import ManageProducts from '../admin/ManageProducts/ManageProducts';
 import ManageOrders from '../admin/ManageOrders/ManageOrders';
 import ManageCategories from '../admin/ManageCategories/ManageCategories';
 import ProtectedRoute from '../components/ProtectedRoute';
+import Messenger from '../admin/Messenger/Messenger';
 
 export const router = createBrowserRouter([
   {
@@ -108,6 +109,11 @@ export const router = createBrowserRouter([
       {
         path: 'categories',
         element: <ManageCategories />,
+      },
+
+      {
+        path: 'chat',
+        element: <Messenger/>,
       },
     ],
   },

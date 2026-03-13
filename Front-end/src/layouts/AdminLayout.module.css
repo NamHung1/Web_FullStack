@@ -1,6 +1,6 @@
 .layout {
   min-height: 100vh;
-  background: #f3f6fb;
+  background: #f3f3f3;
 }
 
 .sider {
@@ -24,6 +24,10 @@
 .menu {
   background: transparent !important;
   border-inline-end: 0 !important;
+}
+
+.menu_text {
+  color: #bebdbd !important;
 }
 
 /* .menu :global(.ant-menu-item) {

@@ -81,7 +81,7 @@ router.get(
   passport.authenticate("google", { session: false }),
   (req: any, res) => {
 
-    const token = generateToken(req.user._id);
+    const token = generateToken(req.user._id, req.user.role);
 
     res.redirect(
       `${frontendUrl}/oauth-success?token=${token}`
@@ -105,7 +105,7 @@ router.get(
   passport.authenticate("facebook", { session: false }),
   (req: any, res) => {
 
-    const token = generateToken(req.user._id);
+    const token = generateToken(req.user._id, req.user.role);
 
     res.redirect(
       `${frontendUrl}/oauth-success?token=${token}`
