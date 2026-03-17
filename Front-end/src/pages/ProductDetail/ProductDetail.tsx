@@ -24,14 +24,18 @@ export default function ProductDetail() {
   }, [id]);
 
   const fetchProductData = async (productId: string) => {
+    setLoading(true);
     try {
-      const [productData, reviewData] = await Promise.all([
-        getProductAPI(productId),
-        getProductReviewsAPI(productId),
-      ]);
+      const productData = await getProductAPI(productId);
       setProduct(productData);
-      setReviews(reviewData);
+      try {
+        const reviewData = await getProductReviewsAPI(productId);
+        setReviews(reviewData);
+      } catch {
+        setReviews([]);
+      }
     } catch {
+      setProduct(null);
       message.error('Failed to load product');
     } finally {
       setLoading(false);
