@@ -2,6 +2,121 @@ import { Request, Response } from 'express';
 import Order from '../models/Order';
 import Cart from '../models/Cart';
 import Product from '../models/Product';
+import Review from '../models/Review';
+
+const attachReviewsForUserOrders = async (orders: any[], userId: string) => {
+  const conditions: Array<{
+    userId: string;
+    productId: string;
+    orderId: string;
+  }> = [];
+
+  orders.forEach((order) => {
+    const orderId = order._id?.toString?.();
+
+    (order.products || []).forEach((item: any) => {
+      const productId = item.productId?._id?.toString?.();
+
+      if (productId && orderId) {
+        conditions.push({ userId, productId, orderId });
+      }
+    });
+  });
+
+  if (!conditions.length) {
+    return orders;
+  }
+
+  const reviews = await Review.find({
+    $or: conditions,
+  })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const reviewMap = new Map(
+    reviews.map((review: any) => [
+      `${String(review.orderId)}:${String(review.productId)}`,
+      review,
+    ]),
+  );
+
+  return orders.map((order) => {
+    const orderId = order._id?.toString?.();
+
+    return {
+      ...order,
+      products: (order.products || []).map((item: any) => {
+        const productId = item.productId?._id?.toString?.();
+        const key = orderId && productId ? `${orderId}:${productId}` : '';
+
+        return {
+          ...item,
+          review: key ? reviewMap.get(key) || null : null,
+        };
+      }),
+    };
+  });
+};
+
+const attachReviewsForAdminOrders = async (orders: any[]) => {
+  const conditions: Array<{
+    userId: string;
+    productId: string;
+    orderId: string;
+  }> = [];
+
+  orders.forEach((order) => {
+    const userId = order.userId?._id?.toString?.();
+    const orderId = order._id?.toString?.();
+
+    (order.products || []).forEach((item: any) => {
+      const productId = item.productId?._id?.toString?.();
+
+      if (userId && productId && orderId) {
+        conditions.push({ userId, productId, orderId });
+      }
+    });
+  });
+
+  if (!conditions.length) {
+    return orders;
+  }
+
+  const reviews = await Review.find({
+    $or: conditions,
+  })
+    .populate('userId', 'name email')
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const reviewMap = new Map(
+    reviews.map((review: any) => [
+      `${String(review.userId?._id || review.userId)}:${String(review.orderId)}:${String(review.productId)}`,
+      review,
+    ]),
+  );
+
+  return orders.map((order) => {
+    const userId = order.userId?._id?.toString?.();
+    const orderId = order._id?.toString?.();
+
+    return {
+      ...order,
+      products: (order.products || []).map((item: any) => {
+        const productId = item.productId?._id?.toString?.();
+        const key =
+          userId && orderId && productId
+            ? `${userId}:${orderId}:${productId}`
+            : '';
+
+        return {
+          ...item,
+          review: key ? reviewMap.get(key) || null : null,
+        };
+      }),
+    };
+  });
+};
 
 // Lấy thông tin của các orders
 export const getOrders = async (req: Request, res: Response) => {
@@ -9,18 +124,23 @@ export const getOrders = async (req: Request, res: Response) => {
 
   const orders = await Order.find({ userId })
     .populate('products.productId')
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .lean();
 
-  res.json(orders);
+  const ordersWithReviews = await attachReviewsForUserOrders(orders, userId);
+
+  res.json(ordersWithReviews);
 };
 
 export const getAllOrders = async (req: Request, res: Response) => {
   const orders = await Order.find()
     .populate('userId', 'name email')
     .populate('products.productId')
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .lean();
 
-  res.json(orders);
+  const ordersWithReviews = await attachReviewsForAdminOrders(orders);
+  res.json(ordersWithReviews);
 };
 
 // Tạo order mới

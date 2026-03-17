@@ -15,6 +15,9 @@ import cartRoutes from "./routes/cart.routes";
 import categoryRoutes from "./routes/categoty.route";
 import adminRoutes from "./routes/admin.routes";
 import chatRoutes from "./routes/chat.routes";
+import reviewRoutes from './routes/review.routes'
+import { addReview, getProductReviews } from './controllers/review.controller';
+import { authMiddleware } from './middleware/auth.middleware';
 import { seedAdmin } from "./config/seedAdmin";
 
 dotenv.config();
@@ -53,7 +56,11 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/reviews", reviewRoutes)
 
+app.post(['/api/orders/:orderId/reviews', '/orders/:orderId/reviews'], authMiddleware, addReview);
+app.post(['/api/reviews', '/reviews'], authMiddleware, addReview);
+app.get(['/api/reviews/product/:productId', '/reviews/product/:productId'], getProductReviews);
 
 const PORT = process.env.PORT || 5000;
 

@@ -1,30 +1,41 @@
 import { useParams } from 'react-router-dom';
-import { Button, Spin, message } from 'antd';
+import { Button, Spin, Rate, Empty, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { getProductAPI } from '../../api/product.api';
 import { addToCartAPI } from '../../api/cart.api';
+import { getProductReviewsAPI } from '../../api/review.api';
 import { useCart } from '../../hooks/useCart';
 import type { Product } from '../../types/product';
+import type { Review } from '../../types/order';
 import styles from './ProductDetail.module.css';
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const { incrementCount } = useCart();
 
   useEffect(() => {
     if (id) {
-      fetchProduct(id);
+      fetchProductData(id);
     }
   }, [id]);
 
-  const fetchProduct = async (productId: string) => {
+  const fetchProductData = async (productId: string) => {
+    setLoading(true);
     try {
-      const data = await getProductAPI(productId);
-      setProduct(data);
+      const productData = await getProductAPI(productId);
+      setProduct(productData);
+      try {
+        const reviewData = await getProductReviewsAPI(productId);
+        setReviews(reviewData);
+      } catch {
+        setReviews([]);
+      }
     } catch {
+      setProduct(null);
       message.error('Failed to load product');
     } finally {
       setLoading(false);
@@ -57,21 +68,42 @@ export default function ProductDetail() {
   const categoryName = typeof product.category === 'object' ? product.category?.name : '';
 
   return (
-    <div className={styles.container}>
-      <img src={product.images?.[0] || 'https://picsum.photos/300'} className={styles.image} alt={product.name} />
+    <div className={styles.wrapper}>
+      <div className={styles.container}>
+        <img src={product.images?.[0] || 'https://picsum.photos/300'} className={styles.image} alt={product.name} />
 
-      <div className={styles.info}>
-        <h2>{product.name}</h2>
+        <div className={styles.info}>
+          <h2>{product.name}</h2>
 
-        {categoryName ? <p>Category: {categoryName}</p> : null}
+          {categoryName ? <p>Category: {categoryName}</p> : null}
+          <p>Stock: {product.stock}</p>
+          <p>{product.description}</p>
 
-        <p>Stock: {product.stock}</p>
+          <Button type="primary" loading={adding} onClick={handleAddToCart}>Add to Cart</Button>
+        </div>
+      </div>
 
-        <p className={styles.price}>${product.price}</p>
-
-        <p>{product.description}</p>
-
-        <Button type="primary" loading={adding} onClick={handleAddToCart}>Add to Cart</Button>
+      <div className={styles.reviewSection}>
+        <h3>Đánh giá sản phẩm ({reviews.length})</h3>
+        {!reviews.length ? (
+          <Empty description="Chưa có đánh giá" />
+        ) : (
+          <div className={styles.reviewList}>
+            {reviews.map((review) => {
+              const reviewer =
+                typeof review.userId === 'object' ? review.userId.name || review.userId.email || 'User' : 'User';
+                return (
+                <div key={review._id} className={styles.reviewItem}>
+                  <div className={styles.reviewHead}>
+                    <strong>{reviewer}</strong>
+                    <Rate disabled value={review.rating} />
+                  </div>
+                  <p>{review.comment || 'Không có nội dung'}</p>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

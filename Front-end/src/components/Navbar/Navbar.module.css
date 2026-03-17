@@ -60,6 +60,13 @@
   font-weight: 500;
 }
 
+.btnLogout {
+  background: #f08238;
+  color: white;
+  border: 1px solid #f08238;
+  transition: all 0.2s;
+}
+
 @media (max-width: 768px) {
   .navbar {
     align-items: flex-start;
