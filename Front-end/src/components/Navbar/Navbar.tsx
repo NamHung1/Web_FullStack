@@ -80,7 +80,7 @@ export default function Navbar() {
 
             <span>{user.name}</span>
 
-            <Button danger size="small" onClick={handleLogout}>
+            <Button danger size="small" onClick={handleLogout} className={styles.btnLogout}>
               Logout
             </Button>
           </div>

@@ -1,6 +1,7 @@
-import { Table, Tag, Select, Button, Space, message } from 'antd';
+import { Table, Tag, Select, Button, Space, Rate, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { adminUpdateOrderStatusAPI } from '../../api/order.api';
+import type { OrderProduct, Review } from '../../types/order';
 import api from '../../api/axios';
 import styles from './ManageOrders.module.css';
 
@@ -9,6 +10,7 @@ type OrderStatus = 'pending' | 'completed' | 'cancelled';
 interface Order {
   _id: string;
   userId: { name: string; email: string };
+  products: OrderProduct[];
   totalPrice: number;
   status: OrderStatus;
   createdAt: string;
@@ -28,7 +30,7 @@ export default function ManageOrders() {
     try {
       const res = await api.get('/admin/orders');
       setOrders(res.data);
-    } catch (error) {
+    } catch {
       message.error('Failed to load orders');
     } finally {
       setLoading(false);
@@ -54,11 +56,51 @@ export default function ManageOrders() {
     }
   };
 
+  const renderReview = (review?: Review | null) => {
+    if (!review) {
+      return <Tag>Not reviewed</Tag>;
+    }
+
+    return (
+      <Space direction="vertical" size={0}>
+        <Rate disabled value={review.rating} />
+        <span>{review.comment || '-'}</span>
+      </Space>
+    );
+  };
+
+
   const columns = [
     {
       title: 'User',
       dataIndex: 'userId',
       render: (user: { name: string; email: string }) => `${user.name} (${user.email})`,
+    },
+    {
+      title: 'Products',
+      dataIndex: 'products',
+      render: (products: OrderProduct[]) => (
+        <Space direction="vertical" size={2}>
+          {products.map((item) => (
+            <span key={item.productId._id}>
+              {item.productId.name} x {item.quantity}
+            </span>
+          ))}
+        </Space>
+      ),
+    },
+    {
+      title: 'Reviews',
+      dataIndex: 'products',
+      render: (products: OrderProduct[]) => (
+        <Space direction="vertical" size={6}>
+          {products.map((item) => (
+            <div key={`${item.productId._id}-review`}>
+              <strong>{item.productId.name}:</strong> {renderReview(item.review)}
+            </div>
+          ))}
+        </Space>
+      ),
     },
     {
       title: 'Total',
@@ -119,7 +161,7 @@ export default function ManageOrders() {
         columns={columns}
         rowKey="_id"
         loading={loading}
-        scroll={{ x: 900 }}
+        scroll={{ x: 1200 }}
         pagination={{ pageSize: 8, showSizeChanger: false }}
       />
     </div>
