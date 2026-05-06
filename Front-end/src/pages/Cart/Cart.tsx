@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { List, Button, Image, message, Empty, Spin, Card } from 'antd';
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import {
@@ -14,7 +14,7 @@ interface Product {
   _id: string;
   name: string;
   price: number;
-  images: string[];
+  images?: string[];
 }
 
 interface CartItem {
@@ -23,7 +23,7 @@ interface CartItem {
 }
 
 interface CartResponseItem {
-  productId: Product;
+  productId: Product | null;
   quantity: number;
 }
 
@@ -41,12 +41,12 @@ export default function Cart() {
   const fetchCart = async () => {
     try {
       const data = await getCartAPI();
-      const normalizedItems = (data?.items || []).map(
-        (item: CartResponseItem) => ({
-          product: item.productId,
+      const normalizedItems = (data?.items || [])
+        .filter((item: CartResponseItem) => item.productId)
+        .map((item: CartResponseItem) => ({
+          product: item.productId as Product,
           quantity: item.quantity,
-        }),
-      );
+        }));
 
       setItems(normalizedItems);
       refreshCartCount();
@@ -101,20 +101,24 @@ export default function Cart() {
         ),
       );
       refreshCartCount();
-    } catch {
-      message.error('Update quantity failed');
+    } catch (error: any) {
+      message.error(error?.response?.data?.message || 'Update quantity failed');
+      fetchCart();
     } finally {
       setUpdatingId(null);
     }
   };
 
   // Tính tổng số sản phẩm
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalItems = useMemo(
+    () => items.reduce((sum, item) => sum + item.quantity, 0),
+    [items],
+  );
 
   // Tính tổng tiền
-  const totalPrice = items.reduce(
-    (sum, item) => sum + item.quantity * item.product.price,
-    0,
+  const totalPrice = useMemo(
+    () => items.reduce((sum, item) => sum + item.quantity * item.product.price, 0),
+    [items],
   );
 
   if (!token) {

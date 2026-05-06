@@ -4,6 +4,23 @@ import Cart from '../models/Cart';
 import Product from '../models/Product';
 import Review from '../models/Review';
 
+const restoreOrderStock = async (products: any[]) => {
+  await Promise.all(
+    products.map((item) => {
+      const productId = item.productId?._id || item.productId;
+      const quantity = Number(item.quantity) || 0;
+
+      if (!productId || quantity <= 0) {
+        return Promise.resolve();
+      }
+
+      return Product.findByIdAndUpdate(productId, {
+        $inc: { stock: quantity },
+      });
+    }),
+  );
+};
+
 const attachReviewsForUserOrders = async (orders: any[], userId: string) => {
   const conditions: Array<{
     userId: string;
@@ -27,9 +44,7 @@ const attachReviewsForUserOrders = async (orders: any[], userId: string) => {
     return orders;
   }
 
-  const reviews = await Review.find({
-    $or: conditions,
-  })
+  const reviews = await Review.find({ $or: conditions })
     .sort({ createdAt: -1 })
     .lean();
 
@@ -164,10 +179,21 @@ export const createOrder = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Cart is empty' });
   }
 
+  const validCartItems = (cart.items as any[]).filter((item) => item.productId);
+
+  if (validCartItems.length !== (cart.items as any[]).length) {
+    (cart.items as any[]) = validCartItems;
+    await cart.save();
+  }
+
+  if (!validCartItems.length) {
+    return res.status(400).json({ message: 'Cart is empty' });
+  }
+
   const decrementedProducts: Array<{ productId: string; quantity: number }> =
     [];
 
-  for (const item of cart.items as any[]) {
+  for (const item of validCartItems) {
     const quantity = Number(item.quantity) || 0;
 
     if (quantity <= 0) {
@@ -209,7 +235,7 @@ export const createOrder = async (req: Request, res: Response) => {
     });
   }
 
-  const products = (cart.items as any[]).map((item) => ({
+  const products = validCartItems.map((item) => ({
     productId: item.productId._id,
     quantity: item.quantity,
     price: item.productId.price,
@@ -230,7 +256,7 @@ export const createOrder = async (req: Request, res: Response) => {
     paymentMethod,
   });
 
-  (cart.items as any[]).splice(0, (cart.items as any[]).length);
+  (cart.items as any[]).splice(0, validCartItems.length);
   await cart.save();
 
   res.json(order);
@@ -259,6 +285,8 @@ export const cancelOrder = async (req: Request, res: Response) => {
 
   const { reason } = req.body;
 
+  await restoreOrderStock(order.products as any[]);
+
   const updatedOrder = await Order.findByIdAndUpdate(
     req.params.id,
     {
@@ -278,15 +306,28 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Invalid status' });
   }
 
+  const currentOrder = await Order.findById(req.params.id);
+
+  if (!currentOrder) {
+    return res.status(404).json({ message: 'Order not found' });
+  }
+
+  if (currentOrder.status === 'cancelled' && status !== 'cancelled') {
+    return res.status(400).json({
+      message:
+        'Cancelled orders cannot be reopened because stock was already restored',
+    });
+  }
+
+  if (status === 'cancelled' && currentOrder.status !== 'cancelled') {
+    await restoreOrderStock(currentOrder.products as any[]);
+  }
+
   const order = await Order.findByIdAndUpdate(
     req.params.id,
     { status },
     { new: true },
   );
-
-  if (!order) {
-    return res.status(404).json({ message: 'Order not found' });
-  }
 
   res.json(order);
 };

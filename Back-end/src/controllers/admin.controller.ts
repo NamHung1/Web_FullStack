@@ -10,6 +10,11 @@ export const getDashboard = async (_req: Request, res: Response) => {
 
   const revenueResult = await Order.aggregate([
     {
+      $match: {
+        status: 'completed',
+      },
+    },
+    {
       $group: {
         _id: null,
         totalRevenue: { $sum: '$totalPrice' },
@@ -29,7 +34,17 @@ export const getUsers = async (_req: Request, res: Response) => {
 };
 
 export const deleteUser = async (req: Request, res: Response) => {
-  await User.findByIdAndDelete(req.params.id);
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  if (user.role === 'admin') {
+    return res.status(400).json({ message: 'Admin accounts cannot be deleted' });
+  }
+
+  await user.deleteOne();
 
   res.json({ message: 'User deleted' });
 };

@@ -13,7 +13,7 @@ interface Product {
 }
 
 interface CartItem {
-  productId: Product;
+  productId: Product | null;
   quantity: number;
 }
 
@@ -31,7 +31,8 @@ export default function Checkout() {
   const fetchCart = async () => {
     try {
       const data = await getCartAPI();
-      setItems(data?.items || []);
+      const normalizedItems = (data?.items || []).filter((item: CartItem) => item.productId);
+      setItems(normalizedItems);
     } catch {
       message.error('Failed to load cart');
     } finally {
@@ -40,7 +41,11 @@ export default function Checkout() {
   };
 
   const totalPrice = useMemo(
-    () => items.reduce((sum, item) => sum + item.quantity * item.productId.price, 0),
+    () =>
+      items.reduce(
+        (sum, item) => sum + item.quantity * (item.productId?.price || 0),
+        0,
+      ),
     [items],
   );
 
@@ -91,8 +96,8 @@ export default function Checkout() {
           dataSource={items}
           renderItem={(item) => (
             <List.Item>
-              <span>{item.productId.name} x {item.quantity}</span>
-              <strong>${(item.quantity * item.productId.price).toLocaleString()}</strong>
+              <span>{item.productId?.name} x {item.quantity}</span>
+              <strong>${(item.quantity * (item.productId?.price || 0)).toLocaleString()}</strong>
             </List.Item>
           )}
         />

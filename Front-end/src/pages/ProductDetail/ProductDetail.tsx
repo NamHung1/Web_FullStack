@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { Button, Spin, Rate, Empty, message } from 'antd';
+import { Button, Spin, Rate, Empty, Typography, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { getProductAPI } from '../../api/product.api';
 import { addToCartAPI } from '../../api/cart.api';
@@ -66,6 +66,9 @@ export default function ProductDetail() {
   }
 
   const categoryName = typeof product.category === 'object' ? product.category?.name : '';
+  const averageRating = reviews.length
+    ? Number((reviews.reduce((sum, item) => sum + item.rating, 0) / reviews.length).toFixed(1))
+    : Number(product.ratingAverage || 0);
 
   return (
     <div className={styles.wrapper}>
@@ -78,6 +81,7 @@ export default function ProductDetail() {
           {categoryName ? <p>Category: {categoryName}</p> : null}
           <p>Stock: {product.stock}</p>
           <p>{product.description}</p>
+          <Typography.Text>Rating: {averageRating}/5 ({reviews.length} reviews)</Typography.Text>
 
           <Button type="primary" loading={adding} onClick={handleAddToCart}>Add to Cart</Button>
         </div>
@@ -99,6 +103,7 @@ export default function ProductDetail() {
                     <Rate disabled value={review.rating} />
                   </div>
                   <p>{review.comment || 'Không có nội dung'}</p>
+                  <small>{new Date(review.createdAt).toLocaleString()}</small>
                 </div>
               );
             })}

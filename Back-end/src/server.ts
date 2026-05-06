@@ -1,24 +1,22 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import passport from "passport";
-import session from "express-session";
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import passport from 'passport';
+import session from 'express-session';
 
-import connectDB from "./config/database";
+import connectDB from './config/database';
 
-import "./config/passport";
+import './config/passport';
 
-import authRoutes from "./routes/auth.routes";
-import productRoutes from "./routes/product.routes";
-import orderRoutes from "./routes/order.routes";
-import cartRoutes from "./routes/cart.routes";
-import categoryRoutes from "./routes/categoty.route";
-import adminRoutes from "./routes/admin.routes";
-import chatRoutes from "./routes/chat.routes";
-import reviewRoutes from './routes/review.routes'
-import { addReview, getProductReviews } from './controllers/review.controller';
-import { authMiddleware } from './middleware/auth.middleware';
-import { seedAdmin } from "./config/seedAdmin";
+import authRoutes from './routes/auth.routes';
+import productRoutes from './routes/product.routes';
+import orderRoutes from './routes/order.routes';
+import cartRoutes from './routes/cart.routes';
+import categoryRoutes from './routes/category.route';
+import adminRoutes from './routes/admin.routes';
+import chatRoutes from './routes/chat.routes';
+import reviewRoutes from './routes/review.routes';
+import { seedAdmin } from './config/seedAdmin';
 
 dotenv.config();
 
@@ -36,10 +34,10 @@ connectDB().then(() => seedAdmin());
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "secret",
+    secret: process.env.SESSION_SECRET || 'secret',
     resave: false,
-    saveUninitialized: false
-  })
+    saveUninitialized: false,
+  }),
 );
 
 app.use(passport.initialize());
@@ -49,18 +47,14 @@ app.use(passport.session());
  Routes
 */
 
-app.use("/api/auth", authRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/orders", orderRoutes);
-app.use("/api/cart", cartRoutes);
-app.use("/api/categories", categoryRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api/chat", chatRoutes);
-app.use("/api/reviews", reviewRoutes)
-
-app.post(['/api/orders/:orderId/reviews', '/orders/:orderId/reviews'], authMiddleware, addReview);
-app.post(['/api/reviews', '/reviews'], authMiddleware, addReview);
-app.get(['/api/reviews/product/:productId', '/reviews/product/:productId'], getProductReviews);
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/chat', chatRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 const PORT = process.env.PORT || 5000;
 

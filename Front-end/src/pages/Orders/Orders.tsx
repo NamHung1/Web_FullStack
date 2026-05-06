@@ -73,7 +73,7 @@ export default function Orders() {
       title: 'Products',
       dataIndex: 'products',
       render: (products: Order['products']) => (
-        <Space direction="vertical" size={2}>
+        <Space orientation="vertical" size={2}>
           {products.map((item) => (
             <span key={item.productId._id}>
               {item.productId.name} x {item.quantity}
@@ -125,7 +125,7 @@ export default function Orders() {
 
         if (record.status === 'completed') {
           return (
-            <Space direction="vertical" size={4}>
+            <Space orientation="vertical" size={4}>
               {record.products.map((item) => (
                 <Button
                   key={item.productId._id}
@@ -172,7 +172,7 @@ export default function Orders() {
         onOk={submitReview}
         confirmLoading={submittingReview}
       >
-        <Space direction="vertical" style={{ width: '100%' }}>
+        <Space orientation="vertical" style={{ width: '100%' }}>
           <Rate
             value={reviewModal.rating}
             onChange={(value) => setReviewModal((prev) => ({ ...prev, rating: value }))}
