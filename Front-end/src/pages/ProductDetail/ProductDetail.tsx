@@ -9,6 +9,19 @@ import type { Product } from '../../types/product';
 import type { Review } from '../../types/order';
 import styles from './ProductDetail.module.css';
 
+const getApiErrorMessage = (error: unknown, fallback: string) => {
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'response' in error &&
+    typeof (error as { response?: { data?: { message?: unknown } } }).response?.data?.message === 'string'
+  ) {
+    return (error as { response: { data: { message: string } } }).response.data.message;
+  }
+
+  return fallback;
+};
+
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
@@ -50,8 +63,8 @@ export default function ProductDetail() {
       await addToCartAPI(product._id, 1);
       incrementCount(1);
       message.success('Added to cart');
-    } catch {
-      message.error('Failed to add to cart. Please login first.');
+    } catch (error: unknown) {
+      message.error(getApiErrorMessage(error, 'Failed to add to cart. Please login first.'));
     } finally {
       setAdding(false);
     }
@@ -69,6 +82,8 @@ export default function ProductDetail() {
   const averageRating = reviews.length
     ? Number((reviews.reduce((sum, item) => sum + item.rating, 0) / reviews.length).toFixed(1))
     : Number(product.ratingAverage || 0);
+  const stock = Number(product.stock) || 0;
+  const isOutOfStock = stock <= 0;
 
   return (
     <div className={styles.wrapper}>
@@ -79,11 +94,18 @@ export default function ProductDetail() {
           <h2>{product.name}</h2>
 
           {categoryName ? <p>Category: {categoryName}</p> : null}
-          <p>Stock: {product.stock}</p>
+          <p>Stock: {stock}</p>
           <p>{product.description}</p>
           <Typography.Text>Rating: {averageRating}/5 ({reviews.length} reviews)</Typography.Text>
 
-          <Button type="primary" loading={adding} onClick={handleAddToCart}>Add to Cart</Button>
+          <Button
+            type="primary"
+            loading={adding}
+            disabled={isOutOfStock}
+            onClick={handleAddToCart}
+          >
+            {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+          </Button>
         </div>
       </div>
 

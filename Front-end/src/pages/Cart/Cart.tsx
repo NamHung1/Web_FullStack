@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { List, Button, Image, message, Empty, Spin, Card } from 'antd';
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import {
@@ -14,6 +14,7 @@ interface Product {
   _id: string;
   name: string;
   price: number;
+  stock?: number;
   images?: string[];
 }
 
@@ -27,6 +28,19 @@ interface CartResponseItem {
   quantity: number;
 }
 
+const getApiErrorMessage = (error: unknown, fallback: string) => {
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'response' in error &&
+    typeof (error as { response?: { data?: { message?: unknown } } }).response?.data?.message === 'string'
+  ) {
+    return (error as { response: { data: { message: string } } }).response.data.message;
+  }
+
+  return fallback;
+};
+
 export default function Cart() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +52,7 @@ export default function Cart() {
   const token = localStorage.getItem('token');
 
   // fetch User API
-  const fetchCart = async () => {
+  const fetchCart = useCallback(async () => {
     try {
       const data = await getCartAPI();
       const normalizedItems = (data?.items || [])
@@ -56,7 +70,7 @@ export default function Cart() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [refreshCartCount]);
 
   // Cảnh báo yêu cầu đăng nhập
   useEffect(() => {
@@ -67,7 +81,7 @@ export default function Cart() {
     }
 
     fetchCart();
-  }, [token]);
+  }, [fetchCart, token]);
 
   // Xoá sản phẩm ra khỏi rỏ hàng
   const removeItem = async (productId: string) => {
@@ -101,8 +115,8 @@ export default function Cart() {
         ),
       );
       refreshCartCount();
-    } catch (error: any) {
-      message.error(error?.response?.data?.message || 'Update quantity failed');
+    } catch (error: unknown) {
+      message.error(getApiErrorMessage(error, 'Update quantity failed'));
       fetchCart();
     } finally {
       setUpdatingId(null);
@@ -153,7 +167,11 @@ export default function Cart() {
         <div className={styles.list}>
           <List
             dataSource={items}
-            renderItem={(item) => (
+            renderItem={(item) => {
+              const stock = Number(item.product.stock) || 0;
+              const isAtStockLimit = item.quantity >= stock;
+
+              return (
               <Card className={styles.itemCard}>
                 <div className={styles.item}>
                   <Image
@@ -166,6 +184,7 @@ export default function Cart() {
                     <h3>{item.product.name}</h3>
 
                     <p className={styles.price}>${item.product.price}</p>
+                    <p>In stock: {stock}</p>
 
                     <div className={styles.quantityControls}>
                       <span>Quantity:</span>
@@ -183,7 +202,8 @@ export default function Cart() {
                       <Button
                         size="small"
                         icon={<PlusOutlined />}
-                        disabled={updatingId === item.product._id}
+                        disabled={updatingId === item.product._id || isAtStockLimit}
+                        title={isAtStockLimit ? `Only ${stock} item(s) available` : undefined}
                         onClick={() =>
                           updateQuantity(item.product._id, item.quantity + 1)
                         }
@@ -200,7 +220,8 @@ export default function Cart() {
                   </Button>
                 </div>
               </Card>
-            )}
+              );
+            }}
           />
         </div>
 

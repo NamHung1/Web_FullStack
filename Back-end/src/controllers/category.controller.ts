@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
 import Category from "../models/Category";
+
+const isValidObjectId = (value: string) => mongoose.Types.ObjectId.isValid(value);
 
 export const getCategories = async (_req: Request, res: Response) => {
   const categories = await Category.find().sort({ name: 1 });
@@ -27,13 +30,18 @@ export const createCategory = async (req: Request, res: Response) => {
 
 export const updateCategory = async (req: Request, res: Response) => {
   const { name } = req.body;
+  const categoryId = String(req.params.id);
+
+  if (!isValidObjectId(categoryId)) {
+    return res.status(400).json({ message: "Invalid category id" });
+  }
 
   if (!name?.trim()) {
     return res.status(400).json({ message: "Category name is required" });
   }
 
   const category = await Category.findByIdAndUpdate(
-    req.params.id,
+    categoryId,
     { name: name.trim() },
     { new: true }
   );
@@ -46,7 +54,13 @@ export const updateCategory = async (req: Request, res: Response) => {
 };
 
 export const deleteCategory = async (req: Request, res: Response) => {
-  const category = await Category.findByIdAndDelete(req.params.id);
+  const categoryId = String(req.params.id);
+
+  if (!isValidObjectId(categoryId)) {
+    return res.status(400).json({ message: "Invalid category id" });
+  }
+
+  const category = await Category.findByIdAndDelete(categoryId);
 
   if (!category) {
     return res.status(404).json({ message: "Category not found" });

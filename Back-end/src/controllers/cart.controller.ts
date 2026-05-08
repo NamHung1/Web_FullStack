@@ -58,6 +58,8 @@ export const addToCart = async (req: Request, res: Response) => {
     return res.status(404).json({ message: 'Product not found' });
   }
 
+  const availableStock = Number(product.stock);
+
   let cart = await Cart.findOne({ userId });
 
   if (!cart) {
@@ -68,8 +70,20 @@ export const addToCart = async (req: Request, res: Response) => {
     (item) => item.productId?.toString() === productId,
   );
 
+  const currentQuantity = existingItem ? Number(existingItem.quantity) || 0 : 0;
+  const nextQuantity = currentQuantity + normalizedQuantity;
+
+  if (nextQuantity > availableStock) {
+    return res.status(400).json({
+      message: `Only ${availableStock} item(s) of "${product.name}" are available in stock`,
+      productName: product.name,
+      availableStock,
+      requestedQuantity: nextQuantity,
+    });
+  }
+
   if (existingItem) {
-    existingItem.quantity += normalizedQuantity;
+    existingItem.quantity = nextQuantity;
   } else {
     (cart.items as any[]).push({
       productId: new mongoose.Types.ObjectId(productId),
@@ -86,7 +100,11 @@ export const addToCart = async (req: Request, res: Response) => {
 
 export const removeFromCart = async (req: Request, res: Response) => {
   const userId = (req as any).user.id;
-  const { productId } = req.params;
+  const productId = String(req.params.productId);
+
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    return res.status(400).json({ message: 'Invalid productId' });
+  }
 
   const cart = await Cart.findOne({ userId });
 
@@ -107,8 +125,12 @@ export const removeFromCart = async (req: Request, res: Response) => {
 
 export const updateCartQuantity = async (req: Request, res: Response) => {
   const userId = (req as any).user.id;
-  const { productId } = req.params;
+  const productId = String(req.params.productId);
   const quantity = Number(req.body.quantity);
+
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    return res.status(400).json({ message: 'Invalid productId' });
+  }
 
   if (!Number.isInteger(quantity) || quantity < 1) {
     return res
@@ -139,6 +161,17 @@ export const updateCartQuantity = async (req: Request, res: Response) => {
     await cart.save();
 
     return res.status(404).json({ message: 'Product no longer exists and was removed from cart' });
+  }
+
+  const availableStock = Number(product.stock) || 0;
+
+  if (quantity > availableStock) {
+    return res.status(400).json({
+      message: `Only ${availableStock} item(s) of "${product.name}" are available in stock`,
+      productName: product.name,
+      availableStock,
+      requestedQuantity: quantity,
+    });
   }
 
   item.quantity = quantity;

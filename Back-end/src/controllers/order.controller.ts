@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import Order from '../models/Order';
 import Cart from '../models/Cart';
 import Product from '../models/Product';
 import Review from '../models/Review';
+
+const isValidObjectId = (value: string) => mongoose.Types.ObjectId.isValid(value);
 
 const restoreOrderStock = async (products: any[]) => {
   await Promise.all(
@@ -224,8 +227,19 @@ export const createOrder = async (req: Request, res: Response) => {
         );
       }
 
+      const currentProduct = await Product.findById(item.productId._id).lean();
+      const availableStock = Number(currentProduct?.stock) || 0;
+
       return res.status(400).json({
-        message: `Product \"${item.productId.name}\" is out of stock or does not have enough quantity`,
+        message: `Product "${item.productId.name}" is out of stock or does not have enough quantity`,
+        unavailableProducts: [
+          {
+            productId: String(item.productId._id),
+            productName: item.productId.name,
+            requestedQuantity: quantity,
+            availableStock,
+          },
+        ],
       });
     }
 
@@ -265,7 +279,13 @@ export const createOrder = async (req: Request, res: Response) => {
 // Huỷ đặt hàng
 export const cancelOrder = async (req: Request, res: Response) => {
   const userId = (req as any).user.id;
-  const order = await Order.findById(req.params.id);
+  const orderId = String(req.params.id);
+
+  if (!isValidObjectId(orderId)) {
+    return res.status(400).json({ message: 'Invalid order id' });
+  }
+
+  const order = await Order.findById(orderId);
 
   if (!order) {
     return res.status(404).json({ message: 'Order not found' });
@@ -288,7 +308,7 @@ export const cancelOrder = async (req: Request, res: Response) => {
   await restoreOrderStock(order.products as any[]);
 
   const updatedOrder = await Order.findByIdAndUpdate(
-    req.params.id,
+    orderId,
     {
       status: 'cancelled',
       cancelReason: reason,
@@ -301,12 +321,17 @@ export const cancelOrder = async (req: Request, res: Response) => {
 
 export const updateOrderStatus = async (req: Request, res: Response) => {
   const { status } = req.body;
+  const orderId = String(req.params.id);
+
+  if (!isValidObjectId(orderId)) {
+    return res.status(400).json({ message: 'Invalid order id' });
+  }
 
   if (!['pending', 'completed', 'cancelled'].includes(status)) {
     return res.status(400).json({ message: 'Invalid status' });
   }
 
-  const currentOrder = await Order.findById(req.params.id);
+  const currentOrder = await Order.findById(orderId);
 
   if (!currentOrder) {
     return res.status(404).json({ message: 'Order not found' });
@@ -324,7 +349,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
   }
 
   const order = await Order.findByIdAndUpdate(
-    req.params.id,
+    orderId,
     { status },
     { new: true },
   );
