@@ -7,6 +7,7 @@ import {
   updateCartItemQuantityAPI,
 } from '../../api/cart.api';
 import { useCart } from '../../hooks/useCart';
+import { getApiErrorMessage } from '../../utils/apiError';
 import styles from './Cart.module.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,19 +28,6 @@ interface CartResponseItem {
   productId: Product | null;
   quantity: number;
 }
-
-const getApiErrorMessage = (error: unknown, fallback: string) => {
-  if (
-    typeof error === 'object' &&
-    error !== null &&
-    'response' in error &&
-    typeof (error as { response?: { data?: { message?: unknown } } }).response?.data?.message === 'string'
-  ) {
-    return (error as { response: { data: { message: string } } }).response.data.message;
-  }
-
-  return fallback;
-};
 
 export default function Cart() {
   const [items, setItems] = useState<CartItem[]>([]);

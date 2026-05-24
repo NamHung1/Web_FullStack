@@ -5,6 +5,7 @@ import styles from './Login.module.css';
 import api from '../../api/axios';
 import { useAuth } from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
+import { getApiErrorMessage } from '../../utils/apiError';
 
 type OAuthProviders = {
   google: boolean;
@@ -25,7 +26,7 @@ export default function Login() {
       try {
         const res = await api.get('/auth/oauth-providers');
         setOauthProviders(res.data);
-      } catch (_error) {
+      } catch {
         setOauthProviders({ google: false, facebook: false });
       }
     };
@@ -33,7 +34,7 @@ export default function Login() {
     fetchOAuthProviders();
   }, []);
 
-  const onFinish = async (values: any) => {
+  const onFinish = async (values: { email: string; password: string }) => {
     setLoading(true);
     try {
       const res = await api.post('/auth/login', {
@@ -47,12 +48,8 @@ export default function Login() {
       } else {
         navigate('/');
       }
-    } catch (error: any) {
-      if (error.response?.data?.message) {
-        message.error(error.response.data.message);
-      } else {
-        message.error('Login failed');
-      }
+    } catch (error: unknown) {
+      message.error(getApiErrorMessage(error, 'Login failed'));
     } finally {
       setLoading(false);
     }

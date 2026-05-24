@@ -151,7 +151,16 @@ export const getOrders = async (req: Request, res: Response) => {
 };
 
 export const getAllOrders = async (req: Request, res: Response) => {
-  const orders = await Order.find()
+  const status = req.query.status as string | undefined;
+  const query: Record<string, string> = {};
+  
+  if (status) {
+    if (!['pending', 'completed', 'cancelled'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status' })
+    }
+  }
+
+  const orders = await Order.find(query)
     .populate('userId', 'name email')
     .populate('products.productId')
     .sort({ createdAt: -1 })
@@ -319,6 +328,7 @@ export const cancelOrder = async (req: Request, res: Response) => {
   res.json(updatedOrder);
 };
 
+//Cập nhật trạng thái giỏ hàng
 export const updateOrderStatus = async (req: Request, res: Response) => {
   const { status } = req.body;
   const orderId = String(req.params.id);
@@ -355,4 +365,8 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
   );
 
   res.json(order);
+};
+
+export const orderFilter = async (req: Request, res: Response) => {
+  return getAllOrders(req, res);
 };

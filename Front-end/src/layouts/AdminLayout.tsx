@@ -26,8 +26,22 @@ const AdminLayout = () => {
   );
 
   useEffect(() => {
-    loadUnread();
-  }, [loadUnread]);
+    let ignore = false;
+
+    const fetchUnread = async () => {
+      const data = await chatApi.getUnreadCount();
+
+      if (!ignore) {
+        setChatUnread(data.unreadCount);
+      }
+    };
+
+    void fetchUnread();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');

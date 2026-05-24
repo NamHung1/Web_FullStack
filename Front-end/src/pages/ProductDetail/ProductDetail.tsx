@@ -7,20 +7,8 @@ import { getProductReviewsAPI } from '../../api/review.api';
 import { useCart } from '../../hooks/useCart';
 import type { Product } from '../../types/product';
 import type { Review } from '../../types/order';
+import { getApiErrorMessage } from '../../utils/apiError';
 import styles from './ProductDetail.module.css';
-
-const getApiErrorMessage = (error: unknown, fallback: string) => {
-  if (
-    typeof error === 'object' &&
-    error !== null &&
-    'response' in error &&
-    typeof (error as { response?: { data?: { message?: unknown } } }).response?.data?.message === 'string'
-  ) {
-    return (error as { response: { data: { message: string } } }).response.data.message;
-  }
-
-  return fallback;
-};
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();

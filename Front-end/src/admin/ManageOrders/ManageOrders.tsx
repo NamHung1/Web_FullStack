@@ -1,11 +1,11 @@
 import { Table, Tag, Select, Button, Space, Rate, message } from 'antd';
-import { useEffect, useState } from 'react';
-import { adminUpdateOrderStatusAPI } from '../../api/order.api';
+import { useCallback, useEffect, useState } from 'react';
+import { adminUpdateOrderStatusAPI, getAdminOrdersAPI, type OrderStatus } from '../../api/order.api';
 import type { OrderProduct, Review } from '../../types/order';
-import api from '../../api/axios';
+import { getApiErrorMessage } from '../../utils/apiError';
 import styles from './ManageOrders.module.css';
 
-type OrderStatus = 'pending' | 'completed' | 'cancelled';
+type OrderStatusFilter = OrderStatus | 'all';
 
 interface Order {
   _id: string;
@@ -21,21 +21,23 @@ export default function ManageOrders() {
   const [loading, setLoading] = useState(true);
   const [draftStatuses, setDraftStatuses] = useState<Record<string, OrderStatus>>({});
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<OrderStatusFilter>('all');
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async (status: OrderStatusFilter) => {
     try {
-      const res = await api.get('/admin/orders');
-      setOrders(res.data);
+      setLoading(true);
+      const data = await getAdminOrdersAPI(status === 'all' ? undefined : status);
+      setOrders(data);
     } catch {
       message.error('Failed to load orders');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchOrders(statusFilter);
+  }, [fetchOrders, statusFilter]);
 
   const handleStatusChange = (orderId: string, status: OrderStatus) => {
     setDraftStatuses((prev) => ({ ...prev, [orderId]: status }));
@@ -47,10 +49,19 @@ export default function ManageOrders() {
     try {
       setUpdatingId(orderId);
       await adminUpdateOrderStatusAPI(orderId, nextStatus);
-      setOrders((prev) => prev.map((order) => (order._id === orderId ? { ...order, status: nextStatus } : order)));
+      setDraftStatuses((prev) => {
+        const next = { ...prev };
+        delete next[orderId];
+        return next;
+      });
+      setOrders((prev) =>
+        prev
+          .map((order) => (order._id === orderId ? { ...order, status: nextStatus } : order))
+          .filter((order) => statusFilter === 'all' || order.status === statusFilter),
+      );
       message.success('Order status updated');
-    } catch (error: any) {
-      message.error(error?.response?.data?.message || 'Failed to update status');
+    } catch (error: unknown) {
+      message.error(getApiErrorMessage(error, 'Failed to update status'));
     } finally {
       setUpdatingId(null);
     }
@@ -155,6 +166,20 @@ export default function ManageOrders() {
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Manage Orders</h1>
+      <Space className={styles.filters}>
+        <span>Filter by status:</span>
+        <Select
+          value={statusFilter}
+          className={styles.filterSelect}
+          options={[
+            { value: 'all', label: 'All' },
+            { value: 'pending', label: 'Pending' },
+            { value: 'completed', label: 'Completed' },
+            { value: 'cancelled', label: 'Cancelled' },
+          ]}
+          onChange={(status: OrderStatusFilter) => setStatusFilter(status)} 
+        />
+      </Space>
       <Table
         className={styles.table}
         dataSource={orders}

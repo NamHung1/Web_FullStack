@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { cancelOrderAPI, getOrdersAPI } from '../../api/order.api';
 import { addReviewAPI } from '../../api/review.api';
 import type { Order, OrderProduct } from '../../types/order';
+import { getApiErrorMessage } from '../../utils/apiError';
 import styles from './Orders.module.css';
 
 export default function Orders() {
@@ -56,8 +57,8 @@ export default function Orders() {
       message.success('Review submitted');
       setReviewModal({ open: false, orderId: '', rating: 5, comment: '' });
       fetchOrders();
-    } catch (error: any) {
-      message.error(error?.response?.data?.message || 'Submit review failed');
+    } catch (error: unknown) {
+      message.error(getApiErrorMessage(error, 'Submit review failed'));
     } finally {
       setSubmittingReview(false);
     }
@@ -149,8 +150,8 @@ export default function Orders() {
       await cancelOrderAPI(orderId, 'Cancelled by customer');
       message.success('Order cancelled');
       fetchOrders();
-    } catch (error: any) {
-      message.error(error?.response?.data?.message || 'Cancel order failed');
+    } catch (error: unknown) {
+      message.error(getApiErrorMessage(error, 'Cancel order failed'));
     }
   };
 
