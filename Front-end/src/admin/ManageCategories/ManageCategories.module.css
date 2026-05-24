@@ -28,29 +28,29 @@
   flex-wrap: wrap;
 }
 
-.cate_create {
+.cateCreate {
   background: #5cb85c;
   color: white;
 }
 
-.cate_create:hover {
+.cateCreate:hover {
   background: white !important;
   border-color: #67b867 !important;
   color: #67b867 !important;
 }
 
-.cate_edit {
+.cateEdit {
   background: #0088ff;
   color: white;
 }
 
-.cate_edit:hover {
+.cateEdit:hover {
   background: white !important;
   border-color: #0088ff !important;
   color: #2197ff !important;
 }
 
-.cate_delete {
+.cateDelete {
   background: #f04438;
   color: white;
 }

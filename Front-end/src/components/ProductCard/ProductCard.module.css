@@ -34,7 +34,7 @@
   font-weight: 700;
 }
 
-.add_to_cart {
+.addToCart {
   width: 100%;
   display: flex;
   justify-content: center;
@@ -45,7 +45,7 @@
   font-weight: bold;
 }
 
-.add_to_cart:hover {
+.addToCart:hover {
   color: #1677ff !important;
   background: #fff !important;
   box-shadow: 5px 5px 10px rgba(20, 20, 20, 0.8);

@@ -28,27 +28,27 @@
   overflow-x: auto;
 }
 
-.product_edit {
+.productEdit {
   background: #0088ff;
 }
 
-.product_delete {
+.productDelete {
   background: #f04438;
   color: white;
 }
 
-.product_create {
+.productCreate {
   background: #5cb85c;
   color: white;
 }
 
-.product_edit:hover {
+.productEdit:hover {
   background: white !important;
   border-color: #0088ff !important;
   color: #2197ff !important;
 }
 
-.product_create:hover {
+.productCreate:hover {
   background: white !important;
   border-color: #67b867 !important;
   color: #67b867 !important;

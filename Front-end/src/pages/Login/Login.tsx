@@ -68,7 +68,7 @@ export default function Login() {
   return (
     <div className={styles.container}>
       <Card className={styles.card}>
-        <h2 className={styles.title_login}>Login</h2>
+        <h2 className={styles.titleLogin}>Login</h2>
 
         <Form layout="vertical" onFinish={onFinish}>
           <Form.Item label="Email" name="email">
@@ -79,7 +79,7 @@ export default function Login() {
             <Input.Password />
           </Form.Item>
 
-          <Button htmlType="submit" block loading={loading} className={styles.btn_login}>
+          <Button htmlType="submit" block loading={loading} className={styles.btnLogin}>
             Login
           </Button>
         </Form>
@@ -89,14 +89,14 @@ export default function Login() {
         {(oauthProviders.google || oauthProviders.facebook) && (
           <div className={styles.oauthSection}>
             {oauthProviders.google && (
-              <Button block onClick={handleGoogleLogin} className={styles.btn_google}>
+              <Button block onClick={handleGoogleLogin} className={styles.btnGoogle}>
                 <GoogleOutlined />
                 Login with Google
               </Button>
             )}
 
             {oauthProviders.facebook && (
-              <Button block onClick={handleFacebookLogin} className={styles.btn_facebook}>
+              <Button block onClick={handleFacebookLogin} className={styles.btnFacebook}>
                 <FacebookOutlined />
                 Login with Facebook
               </Button>
@@ -105,7 +105,7 @@ export default function Login() {
         )}
 
         <p className={styles.text}>
-          No account? <Link to="/register" className={styles.link_register}>Register</Link>
+          No account? <Link to="/register" className={styles.linkRegister}>Register</Link>
         </p>
       </Card>
     </div>

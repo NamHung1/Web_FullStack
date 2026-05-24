@@ -68,7 +68,7 @@ export default function ManageUsers() {
             danger
             disabled={isAdmin}
             onClick={() => deleteUser(record._id)}
-            className={styles.user_delete}
+            className={styles.userDelete}
             title={isAdmin ? "Admin accounts cannot be deleted" : undefined}
           >
             Delete

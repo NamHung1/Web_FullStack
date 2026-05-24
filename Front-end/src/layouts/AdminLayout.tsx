@@ -81,13 +81,13 @@ const AdminLayout = () => {
           <Menu.Item key="chat">
             <Link to="/admin/chat">
               <Badge count={chatUnread} size="small" offset={[8, 0]}>
-                <span className={styles.menu_text}>Chat</span>
+                <span className={styles.menuText}>Chat</span>
               </Badge>
             </Link>
           </Menu.Item>
 
           <Menu.Item key="logout">
-            <Button danger onClick={handleLogout} className={styles.btn_logout}>
+            <Button danger onClick={handleLogout} className={styles.btnLogout}>
               Logout
             </Button>
           </Menu.Item>

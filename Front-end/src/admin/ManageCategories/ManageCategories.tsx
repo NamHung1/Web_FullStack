@@ -95,7 +95,7 @@ export default function ManageCategories() {
     <div className={styles.container}>
       <div className={styles.header}>
         <h1 className={styles.title}>Manage Categories</h1>
-        <Button type="primary" onClick={openCreateModal} className={styles.cate_create}>
+        <Button type="primary" onClick={openCreateModal} className={styles.cateCreate}>
           Add Category
         </Button>
       </div>
@@ -116,7 +116,7 @@ export default function ManageCategories() {
             title: 'Action',
             render: (record: Category) => (
               <div className={styles.actions}>
-                <Button type="primary" onClick={() => openEditModal(record)} className={styles.cate_edit}>
+                <Button type="primary" onClick={() => openEditModal(record)} className={styles.cateEdit}>
                   Edit
                 </Button>
                 <Popconfirm
@@ -124,7 +124,7 @@ export default function ManageCategories() {
                   description="Are you sure to delete this category?"
                   onConfirm={() => handleDelete(record._id)}
                 >
-                  <Button danger className={styles.cate_delete}>Delete</Button>
+                  <Button danger className={styles.cateDelete}>Delete</Button>
                 </Popconfirm>
               </div>
             ),
