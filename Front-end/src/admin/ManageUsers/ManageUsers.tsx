@@ -24,7 +24,7 @@ export default function ManageUsers() {
     try {
       const res = await api.get("/admin/users")
       setUsers(res.data)
-    } catch (error) {
+    } catch {
       message.error("Failed to load users")
     } finally {
       setLoading(false)
@@ -36,7 +36,7 @@ export default function ManageUsers() {
       await api.delete(`/admin/users/${id}`)
       setUsers(users.filter(u => u._id !== id))
       message.success("User deleted")
-    } catch (error) {
+    } catch {
       message.error("Failed to delete user")
     }
   }
@@ -60,9 +60,21 @@ export default function ManageUsers() {
 
     {
       title: "Action",
-      render: (record: User) => (
-        <Button danger onClick={() => deleteUser(record._id)} className={styles.user_delete}>Delete</Button>
-      )
+      render: (_: unknown, record: User) => {
+        const isAdmin = record.role === "admin"
+
+        return (
+          <Button
+            danger
+            disabled={isAdmin}
+            onClick={() => deleteUser(record._id)}
+            className={styles.userDelete}
+            title={isAdmin ? "Admin accounts cannot be deleted" : undefined}
+          >
+            Delete
+          </Button>
+        )
+      }
     }
 
   ]

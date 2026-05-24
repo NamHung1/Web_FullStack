@@ -5,6 +5,7 @@ import styles from './Login.module.css';
 import api from '../../api/axios';
 import { useAuth } from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
+import { getApiErrorMessage } from '../../utils/apiError';
 
 type OAuthProviders = {
   google: boolean;
@@ -25,7 +26,7 @@ export default function Login() {
       try {
         const res = await api.get('/auth/oauth-providers');
         setOauthProviders(res.data);
-      } catch (_error) {
+      } catch {
         setOauthProviders({ google: false, facebook: false });
       }
     };
@@ -33,7 +34,7 @@ export default function Login() {
     fetchOAuthProviders();
   }, []);
 
-  const onFinish = async (values: any) => {
+  const onFinish = async (values: { email: string; password: string }) => {
     setLoading(true);
     try {
       const res = await api.post('/auth/login', {
@@ -47,12 +48,8 @@ export default function Login() {
       } else {
         navigate('/');
       }
-    } catch (error: any) {
-      if (error.response?.data?.message) {
-        message.error(error.response.data.message);
-      } else {
-        message.error('Login failed');
-      }
+    } catch (error: unknown) {
+      message.error(getApiErrorMessage(error, 'Login failed'));
     } finally {
       setLoading(false);
     }
@@ -71,7 +68,7 @@ export default function Login() {
   return (
     <div className={styles.container}>
       <Card className={styles.card}>
-        <h2 className={styles.title_login}>Login</h2>
+        <h2 className={styles.titleLogin}>Login</h2>
 
         <Form layout="vertical" onFinish={onFinish}>
           <Form.Item label="Email" name="email">
@@ -82,7 +79,7 @@ export default function Login() {
             <Input.Password />
           </Form.Item>
 
-          <Button htmlType="submit" block loading={loading} className={styles.btn_login}>
+          <Button htmlType="submit" block loading={loading} className={styles.btnLogin}>
             Login
           </Button>
         </Form>
@@ -92,14 +89,14 @@ export default function Login() {
         {(oauthProviders.google || oauthProviders.facebook) && (
           <div className={styles.oauthSection}>
             {oauthProviders.google && (
-              <Button block onClick={handleGoogleLogin} className={styles.btn_google}>
+              <Button block onClick={handleGoogleLogin} className={styles.btnGoogle}>
                 <GoogleOutlined />
                 Login with Google
               </Button>
             )}
 
             {oauthProviders.facebook && (
-              <Button block onClick={handleFacebookLogin} className={styles.btn_facebook}>
+              <Button block onClick={handleFacebookLogin} className={styles.btnFacebook}>
                 <FacebookOutlined />
                 Login with Facebook
               </Button>
@@ -108,7 +105,7 @@ export default function Login() {
         )}
 
         <p className={styles.text}>
-          No account? <Link to="/register" className={styles.link_register}>Register</Link>
+          No account? <Link to="/register" className={styles.linkRegister}>Register</Link>
         </p>
       </Card>
     </div>

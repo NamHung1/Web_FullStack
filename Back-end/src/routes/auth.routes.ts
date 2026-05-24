@@ -28,21 +28,21 @@ const ensureStrategy = (strategy: string) => (req: any, res: any, next: any) => 
 router.post("/register", register);
 router.post("/login", login);
 
-router.post("/reset-admin", async (req, res) => {
-  try {
-    await User.deleteMany({ role: "admin" });
-    const password = await hashPassword("admin123");
-    await User.create({
-      name: "Admin",
-      email: "admin@shop.com",
-      password,
-      role: "admin"
-    });
-    res.json({ message: "Admin reset" });
-  } catch (error) {
-    res.status(500).json({ message: "Error" });
-  }
-});
+// router.post("/reset-admin", async (req, res) => {
+//   try {
+//     await User.deleteMany({ role: "admin" });
+//     const password = await hashPassword("admin123");
+//     await User.create({
+//       name: "Admin",
+//       email: "admin@shop.com",
+//       password,
+//       role: "admin"
+//     });
+//     res.json({ message: "Admin reset" });
+//   } catch (error) {
+//     res.status(500).json({ message: "Error" });
+//   }
+// });
 
 router.get("/me", authMiddleware, async (req, res) => {
   try {

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { cancelOrderAPI, getOrdersAPI } from '../../api/order.api';
 import { addReviewAPI } from '../../api/review.api';
 import type { Order, OrderProduct } from '../../types/order';
+import { getApiErrorMessage } from '../../utils/apiError';
 import styles from './Orders.module.css';
 
 export default function Orders() {
@@ -56,8 +57,8 @@ export default function Orders() {
       message.success('Review submitted');
       setReviewModal({ open: false, orderId: '', rating: 5, comment: '' });
       fetchOrders();
-    } catch (error: any) {
-      message.error(error?.response?.data?.message || 'Submit review failed');
+    } catch (error: unknown) {
+      message.error(getApiErrorMessage(error, 'Submit review failed'));
     } finally {
       setSubmittingReview(false);
     }
@@ -73,7 +74,7 @@ export default function Orders() {
       title: 'Products',
       dataIndex: 'products',
       render: (products: Order['products']) => (
-        <Space direction="vertical" size={2}>
+        <Space orientation="vertical" size={2}>
           {products.map((item) => (
             <span key={item.productId._id}>
               {item.productId.name} x {item.quantity}
@@ -125,7 +126,7 @@ export default function Orders() {
 
         if (record.status === 'completed') {
           return (
-            <Space direction="vertical" size={4}>
+            <Space orientation="vertical" size={4}>
               {record.products.map((item) => (
                 <Button
                   key={item.productId._id}
@@ -149,8 +150,8 @@ export default function Orders() {
       await cancelOrderAPI(orderId, 'Cancelled by customer');
       message.success('Order cancelled');
       fetchOrders();
-    } catch (error: any) {
-      message.error(error?.response?.data?.message || 'Cancel order failed');
+    } catch (error: unknown) {
+      message.error(getApiErrorMessage(error, 'Cancel order failed'));
     }
   };
 
@@ -172,7 +173,7 @@ export default function Orders() {
         onOk={submitReview}
         confirmLoading={submittingReview}
       >
-        <Space direction="vertical" style={{ width: '100%' }}>
+        <Space orientation="vertical" style={{ width: '100%' }}>
           <Rate
             value={reviewModal.rating}
             onChange={(value) => setReviewModal((prev) => ({ ...prev, rating: value }))}

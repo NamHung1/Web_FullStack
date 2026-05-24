@@ -15,6 +15,10 @@
   margin: 16px 0;
 }
 
+.stockAlert {
+  margin: 12px 0 16px;
+}
+
 .total {
   font-size: 20px;
   font-weight: 700;

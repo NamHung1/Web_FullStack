@@ -59,14 +59,51 @@ const ChatWidget = () => {
   );
 
   useEffect(() => {
-    loadUnread();
-  }, [loadUnread]);
+    let ignore = false;
+
+    const fetchUnread = async () => {
+      if (!user || user.role !== 'user') {
+        return;
+      }
+
+      const data = await chatApi.getUnreadCount();
+
+      if (!ignore) {
+        setUnreadCount(data.unreadCount);
+      }
+    };
+
+    void fetchUnread();
+
+    return () => {
+      ignore = true;
+    };
+  }, [user]);
 
   useEffect(() => {
     if (open) {
-      loadConversation();
+      let ignore = false;
+
+      const fetchConversation = async () => {
+        if (!user || user.role !== 'user') {
+          return;
+        }
+
+        const data = await chatApi.getConversation('admin');
+
+        if (!ignore) {
+          setMessages(data.messages);
+          setUnreadCount(0);
+        }
+      };
+
+      void fetchConversation();
+
+      return () => {
+        ignore = true;
+      };
     }
-  }, [loadConversation, open]);
+  }, [open, user]);
 
   useEffect(() => {
     if (listRef.current) {

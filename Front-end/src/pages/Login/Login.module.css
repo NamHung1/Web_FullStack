@@ -25,7 +25,7 @@
   text-align: center;
 }
 
-.btn_login {
+.btnLogin {
   width: 100%;
   display: flex;
   justify-content: center;
@@ -40,7 +40,7 @@
   cursor: pointer;
 }
 
-.btn_login:hover {
+.btnLogin:hover {
   background: #fff !important;
   color: #16ff48 !important;
   border-color: #16ff48 !important;
@@ -59,7 +59,7 @@
   gap: 12px;
 }
 
-.btn_google {
+.btnGoogle {
   width: 100%;
   display: flex;
   justify-content: center;
@@ -74,13 +74,13 @@
   cursor: pointer;
 }
 
-.btn_google:hover {
+.btnGoogle:hover {
   background: #fff;
   color: #ff9216 !important;
   border-color: #ff9216 !important;
 }
 
-.btn_facebook {
+.btnFacebook {
   width: 100%;
   display: flex;
   justify-content: center;
@@ -95,11 +95,11 @@
   cursor: pointer;
 }
 
-.btn_facebook:hover {
+.btnFacebook:hover {
   background: #fff;
   color: #1677ff;
 }
 
-.link_register {
+.linkRegister {
   color: #1677ff;
 }

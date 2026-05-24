@@ -175,10 +175,10 @@ export default function ManageProducts() {
       title: 'Action',
       render: (record: Product) => (
         <div className={styles.actions}>
-          <Button type="primary" onClick={() => openEditModal(record)} className={styles.product_edit}>
+          <Button type="primary" onClick={() => openEditModal(record)} className={styles.productEdit}>
             Edit
           </Button>
-          <Button danger onClick={() => deleteProduct(record._id)} className={styles.product_delete}>
+          <Button danger onClick={() => deleteProduct(record._id)} className={styles.productDelete}>
             Delete
           </Button>
         </div>
@@ -191,7 +191,7 @@ export default function ManageProducts() {
       <div className={styles.header}>
         <h1>Manage Products</h1>
 
-        <Button type="primary" onClick={openCreateModal} className={styles.product_create}>
+        <Button type="primary" onClick={openCreateModal} className={styles.productCreate}>
           Add Product
         </Button>
       </div>

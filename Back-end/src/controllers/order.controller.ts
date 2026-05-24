@@ -1,8 +1,28 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import Order from '../models/Order';
 import Cart from '../models/Cart';
 import Product from '../models/Product';
 import Review from '../models/Review';
+
+const isValidObjectId = (value: string) => mongoose.Types.ObjectId.isValid(value);
+
+const restoreOrderStock = async (products: any[]) => {
+  await Promise.all(
+    products.map((item) => {
+      const productId = item.productId?._id || item.productId;
+      const quantity = Number(item.quantity) || 0;
+
+      if (!productId || quantity <= 0) {
+        return Promise.resolve();
+      }
+
+      return Product.findByIdAndUpdate(productId, {
+        $inc: { stock: quantity },
+      });
+    }),
+  );
+};
 
 const attachReviewsForUserOrders = async (orders: any[], userId: string) => {
   const conditions: Array<{
@@ -27,9 +47,7 @@ const attachReviewsForUserOrders = async (orders: any[], userId: string) => {
     return orders;
   }
 
-  const reviews = await Review.find({
-    $or: conditions,
-  })
+  const reviews = await Review.find({ $or: conditions })
     .sort({ createdAt: -1 })
     .lean();
 
@@ -133,7 +151,16 @@ export const getOrders = async (req: Request, res: Response) => {
 };
 
 export const getAllOrders = async (req: Request, res: Response) => {
-  const orders = await Order.find()
+  const status = req.query.status as string | undefined;
+  const query: Record<string, string> = {};
+  
+  if (status) {
+    if (!['pending', 'completed', 'cancelled'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status' })
+    }
+  }
+
+  const orders = await Order.find(query)
     .populate('userId', 'name email')
     .populate('products.productId')
     .sort({ createdAt: -1 })
@@ -164,10 +191,21 @@ export const createOrder = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Cart is empty' });
   }
 
+  const validCartItems = (cart.items as any[]).filter((item) => item.productId);
+
+  if (validCartItems.length !== (cart.items as any[]).length) {
+    (cart.items as any[]) = validCartItems;
+    await cart.save();
+  }
+
+  if (!validCartItems.length) {
+    return res.status(400).json({ message: 'Cart is empty' });
+  }
+
   const decrementedProducts: Array<{ productId: string; quantity: number }> =
     [];
 
-  for (const item of cart.items as any[]) {
+  for (const item of validCartItems) {
     const quantity = Number(item.quantity) || 0;
 
     if (quantity <= 0) {
@@ -198,8 +236,19 @@ export const createOrder = async (req: Request, res: Response) => {
         );
       }
 
+      const currentProduct = await Product.findById(item.productId._id).lean();
+      const availableStock = Number(currentProduct?.stock) || 0;
+
       return res.status(400).json({
-        message: `Product \"${item.productId.name}\" is out of stock or does not have enough quantity`,
+        message: `Product "${item.productId.name}" is out of stock or does not have enough quantity`,
+        unavailableProducts: [
+          {
+            productId: String(item.productId._id),
+            productName: item.productId.name,
+            requestedQuantity: quantity,
+            availableStock,
+          },
+        ],
       });
     }
 
@@ -209,7 +258,7 @@ export const createOrder = async (req: Request, res: Response) => {
     });
   }
 
-  const products = (cart.items as any[]).map((item) => ({
+  const products = validCartItems.map((item) => ({
     productId: item.productId._id,
     quantity: item.quantity,
     price: item.productId.price,
@@ -230,7 +279,7 @@ export const createOrder = async (req: Request, res: Response) => {
     paymentMethod,
   });
 
-  (cart.items as any[]).splice(0, (cart.items as any[]).length);
+  (cart.items as any[]).splice(0, validCartItems.length);
   await cart.save();
 
   res.json(order);
@@ -239,7 +288,13 @@ export const createOrder = async (req: Request, res: Response) => {
 // Huỷ đặt hàng
 export const cancelOrder = async (req: Request, res: Response) => {
   const userId = (req as any).user.id;
-  const order = await Order.findById(req.params.id);
+  const orderId = String(req.params.id);
+
+  if (!isValidObjectId(orderId)) {
+    return res.status(400).json({ message: 'Invalid order id' });
+  }
+
+  const order = await Order.findById(orderId);
 
   if (!order) {
     return res.status(404).json({ message: 'Order not found' });
@@ -259,8 +314,10 @@ export const cancelOrder = async (req: Request, res: Response) => {
 
   const { reason } = req.body;
 
+  await restoreOrderStock(order.products as any[]);
+
   const updatedOrder = await Order.findByIdAndUpdate(
-    req.params.id,
+    orderId,
     {
       status: 'cancelled',
       cancelReason: reason,
@@ -271,22 +328,45 @@ export const cancelOrder = async (req: Request, res: Response) => {
   res.json(updatedOrder);
 };
 
+//Cập nhật trạng thái giỏ hàng
 export const updateOrderStatus = async (req: Request, res: Response) => {
   const { status } = req.body;
+  const orderId = String(req.params.id);
+
+  if (!isValidObjectId(orderId)) {
+    return res.status(400).json({ message: 'Invalid order id' });
+  }
 
   if (!['pending', 'completed', 'cancelled'].includes(status)) {
     return res.status(400).json({ message: 'Invalid status' });
   }
 
+  const currentOrder = await Order.findById(orderId);
+
+  if (!currentOrder) {
+    return res.status(404).json({ message: 'Order not found' });
+  }
+
+  if (currentOrder.status === 'cancelled' && status !== 'cancelled') {
+    return res.status(400).json({
+      message:
+        'Cancelled orders cannot be reopened because stock was already restored',
+    });
+  }
+
+  if (status === 'cancelled' && currentOrder.status !== 'cancelled') {
+    await restoreOrderStock(currentOrder.products as any[]);
+  }
+
   const order = await Order.findByIdAndUpdate(
-    req.params.id,
+    orderId,
     { status },
     { new: true },
   );
 
-  if (!order) {
-    return res.status(404).json({ message: 'Order not found' });
-  }
-
   res.json(order);
+};
+
+export const orderFilter = async (req: Request, res: Response) => {
+  return getAllOrders(req, res);
 };

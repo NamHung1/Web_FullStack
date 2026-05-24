@@ -54,12 +54,50 @@ const Messenger = () => {
   );
 
   useEffect(() => {
-    loadUsers();
-  }, [loadUsers]);
+    let ignore = false;
+
+    const fetchUsers = async () => {
+      const data = await chatApi.getChatUsers();
+
+      if (ignore) {
+        return;
+      }
+
+      setUsers(data.users)
+      if (!activeUserId && data.users[0]) {
+        setActiveUserId(data.users[0]._id);
+      }
+    };
+
+    void fetchUsers();
+
+    return () => {
+      ignore = true;
+    };
+  }, [activeUserId]);
 
   useEffect(() => {
-    loadConversation();
-  }, [loadConversation]);
+    let ignore = false;
+
+    const fetchConversation = async () => {
+      if (!activeUserId) {
+        setMessages([]);
+        return;
+      }
+
+      const data = await chatApi.getConversation(activeUserId);
+
+      if (!ignore) {
+        setMessages(data.messages);
+      }
+    };
+
+    void fetchConversation();
+
+    return () => {
+      ignore = true;
+    };
+  }, [activeUserId]);
 
   const handleSend = async () => {
     if (!activeUserId || !content.trim()) {

@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { Button, Spin, Rate, Empty, message } from 'antd';
+import { Button, Spin, Rate, Empty, Typography, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { getProductAPI } from '../../api/product.api';
 import { addToCartAPI } from '../../api/cart.api';
@@ -7,6 +7,7 @@ import { getProductReviewsAPI } from '../../api/review.api';
 import { useCart } from '../../hooks/useCart';
 import type { Product } from '../../types/product';
 import type { Review } from '../../types/order';
+import { getApiErrorMessage } from '../../utils/apiError';
 import styles from './ProductDetail.module.css';
 
 export default function ProductDetail() {
@@ -50,8 +51,8 @@ export default function ProductDetail() {
       await addToCartAPI(product._id, 1);
       incrementCount(1);
       message.success('Added to cart');
-    } catch {
-      message.error('Failed to add to cart. Please login first.');
+    } catch (error: unknown) {
+      message.error(getApiErrorMessage(error, 'Failed to add to cart. Please login first.'));
     } finally {
       setAdding(false);
     }
@@ -66,6 +67,11 @@ export default function ProductDetail() {
   }
 
   const categoryName = typeof product.category === 'object' ? product.category?.name : '';
+  const averageRating = reviews.length
+    ? Number((reviews.reduce((sum, item) => sum + item.rating, 0) / reviews.length).toFixed(1))
+    : Number(product.ratingAverage || 0);
+  const stock = Number(product.stock) || 0;
+  const isOutOfStock = stock <= 0;
 
   return (
     <div className={styles.wrapper}>
@@ -76,10 +82,18 @@ export default function ProductDetail() {
           <h2>{product.name}</h2>
 
           {categoryName ? <p>Category: {categoryName}</p> : null}
-          <p>Stock: {product.stock}</p>
+          <p>Stock: {stock}</p>
           <p>{product.description}</p>
+          <Typography.Text>Rating: {averageRating}/5 ({reviews.length} reviews)</Typography.Text>
 
-          <Button type="primary" loading={adding} onClick={handleAddToCart}>Add to Cart</Button>
+          <Button
+            type="primary"
+            loading={adding}
+            disabled={isOutOfStock}
+            onClick={handleAddToCart}
+          >
+            {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+          </Button>
         </div>
       </div>
 
@@ -99,6 +113,7 @@ export default function ProductDetail() {
                     <Rate disabled value={review.rating} />
                   </div>
                   <p>{review.comment || 'Không có nội dung'}</p>
+                  <small>{new Date(review.createdAt).toLocaleString()}</small>
                 </div>
               );
             })}

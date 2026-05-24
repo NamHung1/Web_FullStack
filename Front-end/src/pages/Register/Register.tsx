@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import styles from './Register.module.css';
 import api from '../../api/axios';
 import { useState } from 'react';
+import { getApiErrorMessage } from '../../utils/apiError';
 
 interface RegisterForm {
   name: string;
@@ -27,12 +28,8 @@ export default function Register() {
       message.success('Register successful! Please login.');
 
       navigate('/login');
-    } catch (error: any) {
-      if (error.response?.data?.message) {
-        message.error(error.response.data.message);
-      } else {
-        message.error('Register failed');
-      }
+    } catch (error: unknown) {
+      message.error(getApiErrorMessage(error, 'Register failed'));
     } finally {
       setLoading(false);
     }

@@ -6,8 +6,18 @@ interface CreateOrderPayload {
   paymentMethod: 'cod' | 'bank_transfer' | 'momo';
 }
 
+export type OrderStatus = 'pending' | 'completed' | 'cancelled';
+
 export const getOrdersAPI = async () => {
   const res = await api.get('/orders');
+  return res.data;
+};
+
+export const getAdminOrdersAPI = async (status?: OrderStatus) => {
+  const res = await api.get('/admin/orders', {
+    params: status ? { status } : undefined,
+  });
+
   return res.data;
 };
 
@@ -27,7 +37,7 @@ export const cancelOrderAPI = async (id: string, reason: string) => {
 
 export const updateOrderStatusAPI = async (
   id: string,
-  status: 'pending' | 'completed' | 'cancelled',
+  status: OrderStatus,
 ) => {
   const res = await api.patch(`/orders/${id}/status`, { status });
   return res.data;
@@ -35,7 +45,7 @@ export const updateOrderStatusAPI = async (
 
 export const adminUpdateOrderStatusAPI = async (
   id: string,
-  status: 'pending' | 'completed' | 'cancelled',
+  status: OrderStatus,
 ) => {
   const res = await api.patch(`/admin/orders/${id}/status`, { status });
   return res.data;

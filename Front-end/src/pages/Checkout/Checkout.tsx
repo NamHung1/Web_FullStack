@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Form, Input, Button, Card, List, Empty, Select, message, Spin } from 'antd';
+import { Alert, Form, Input, Button, Card, List, Empty, Select, message, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { getCartAPI } from '../../api/cart.api';
 import { createOrderAPI } from '../../api/order.api';
@@ -13,14 +13,30 @@ interface Product {
 }
 
 interface CartItem {
-  productId: Product;
+  productId: Product | null;
   quantity: number;
 }
+
+interface StockIssue {
+  productId: string;
+  productName: string;
+  requestedQuantity: number;
+  availableStock: number;
+}
+
+const getApiErrorData = (error: unknown) => {
+  if (typeof error === 'object' && error !== null && 'response' in error) {
+    return (error as { response?: { data?: unknown } }).response?.data;
+  }
+
+  return undefined;
+};
 
 export default function Checkout() {
   const [loading, setLoading] = useState(true);
   const [placingOrder, setPlacingOrder] = useState(false);
   const [items, setItems] = useState<CartItem[]>([]);
+  const [stockIssues, setStockIssues] = useState<StockIssue[]>([]);
   const navigate = useNavigate();
   const { refreshCartCount } = useCart();
 
@@ -31,7 +47,8 @@ export default function Checkout() {
   const fetchCart = async () => {
     try {
       const data = await getCartAPI();
-      setItems(data?.items || []);
+      const normalizedItems = (data?.items || []).filter((item: CartItem) => item.productId);
+      setItems(normalizedItems);
     } catch {
       message.error('Failed to load cart');
     } finally {
@@ -40,7 +57,11 @@ export default function Checkout() {
   };
 
   const totalPrice = useMemo(
-    () => items.reduce((sum, item) => sum + item.quantity * item.productId.price, 0),
+    () =>
+      items.reduce(
+        (sum, item) => sum + item.quantity * (item.productId?.price || 0),
+        0,
+      ),
     [items],
   );
 
@@ -52,12 +73,23 @@ export default function Checkout() {
 
     try {
       setPlacingOrder(true);
+      setStockIssues([]);
       await createOrderAPI(values);
       await refreshCartCount();
       message.success('Order placed successfully');
       navigate('/orders');
-    } catch (error: any) {
-      message.error(error?.response?.data?.message || 'Failed to place order');
+    } catch (error: unknown) {
+      const data = getApiErrorData(error) as
+        | { message?: string; unavailableProducts?: StockIssue[] }
+        | undefined;
+
+      if (data?.unavailableProducts?.length) {
+        setStockIssues(data.unavailableProducts);
+        message.error('Some products do not have enough stock');
+        await fetchCart();
+      } else {
+        message.error(data?.message || 'Failed to place order');
+      }
     } finally {
       setPlacingOrder(false);
     }
@@ -86,13 +118,33 @@ export default function Checkout() {
     <div className={styles.container}>
       <Card className={styles.card}>
         <h2>Checkout</h2>
+        {stockIssues.length ? (
+          <Alert
+            type="error"
+            showIcon
+            className={styles.stockAlert}
+            message="Some products do not have enough stock"
+            description={
+              <List
+                size="small"
+                dataSource={stockIssues}
+                renderItem={(item) => (
+                  <List.Item>
+                    {item.productName}: requested {item.requestedQuantity}, available {item.availableStock}
+                  </List.Item>
+                )}
+              />
+            }
+          />
+        ) : null}
+
         <List
           className={styles.orderList}
           dataSource={items}
           renderItem={(item) => (
             <List.Item>
-              <span>{item.productId.name} x {item.quantity}</span>
-              <strong>${(item.quantity * item.productId.price).toLocaleString()}</strong>
+              <span>{item.productId?.name} x {item.quantity}</span>
+              <strong>${(item.quantity * (item.productId?.price || 0)).toLocaleString()}</strong>
             </List.Item>
           )}
         />

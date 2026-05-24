@@ -26,7 +26,7 @@
   border-inline-end: 0 !important;
 }
 
-.menu_text {
+.menuText {
   color: #bebdbd !important;
 }
 
@@ -54,7 +54,7 @@
   min-height: calc(100vh - 56px);
 }
 
-.btn_logout {
+.btnLogout {
   text-align: center;
   width: 100%;
   background: #f04438;
@@ -63,7 +63,7 @@
   font-weight: bolder;
 }
 
-.btn_logout:hover {
+.btnLogout:hover {
   background: #7e231d !important;
 }
 

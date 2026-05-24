@@ -31,7 +31,7 @@ export default function OAuthSuccess() {
         } else {
           navigate('/');
         }
-      } catch (_error) {
+      } catch {
         localStorage.removeItem('token');
         message.error('Google login failed');
         navigate('/login');
